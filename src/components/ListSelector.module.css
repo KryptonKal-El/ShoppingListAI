@@ -1,0 +1,147 @@
+.container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.newBtn {
+  font-size: 0.8rem;
+  color: #4caf50;
+  background: none;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.newBtn:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.createForm {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.createInput {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.createInput:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.createBtn {
+  padding: 0.5rem 1rem;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.createBtn:disabled {
+  background: #c8e6c9;
+  cursor: not-allowed;
+}
+
+.lists {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.emptyMsg {
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 0.75rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: background 0.1s;
+}
+
+.listItem:hover {
+  background: #f5f5f5;
+}
+
+.active {
+  background: #e8f5e9;
+}
+
+.active:hover {
+  background: #c8e6c9;
+}
+
+.listBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.listName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.listCount {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: transparent;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  transition: color 0.1s;
+}
+
+.listItem:hover .deleteBtn {
+  color: #ccc;
+}
+
+.deleteBtn:hover {
+  color: #e53935 !important;
+}

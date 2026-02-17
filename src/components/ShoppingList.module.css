@@ -1,0 +1,82 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #999;
+}
+
+.empty p:first-child {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  font-size: 0.9rem;
+}
+
+.group {
+  margin-bottom: 0.75rem;
+}
+
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #555;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0.25rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.count {
+  font-size: 0.75rem;
+  background: #eee;
+  color: #777;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.checkedSection {
+  margin-top: 1rem;
+  opacity: 0.7;
+}
+
+.checkedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clearBtn {
+  font-size: 0.8rem;
+  color: #e53935;
+  background: none;
+  border: 1px solid #e53935;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.clearBtn:hover {
+  background: #e53935;
+  color: white;
+}

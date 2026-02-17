@@ -1,0 +1,76 @@
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #333;
+  margin: 0;
+}
+
+.ai {
+  color: #4caf50;
+  font-weight: 800;
+}
+
+.tagline {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+
+.main {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.listTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 1rem;
+}
+
+.noList {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #999;
+}
+
+.noList h2 {
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 700px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: static;
+  }
+}
