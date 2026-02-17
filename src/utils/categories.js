@@ -1,6 +1,7 @@
 /**
  * Category definitions and mappings for grocery items.
  * Maps common items to their categories and provides display metadata.
+ * Supports custom user-defined categories that layer on top of built-in ones.
  */
 
 export const CATEGORIES = {
@@ -234,26 +235,43 @@ const KEYWORD_MAP = {
 
 /**
  * Categorizes an item name by matching against known keywords.
- * Tries exact match first, then partial match on individual words.
+ * Checks custom category keywords first, then falls back to built-in mappings.
  * @param {string} itemName - The name of the grocery item
- * @returns {string} The category key from CATEGORIES
+ * @param {Array} [customCategories=[]] - User-defined categories with keywords
+ * @returns {string} The category key
  */
-export const categorizeItem = (itemName) => {
+export const categorizeItem = (itemName, customCategories = []) => {
   const normalized = itemName.toLowerCase().trim();
 
-  // Exact match
+  // Check custom categories first (user keywords take priority)
+  for (const cat of customCategories) {
+    for (const keyword of cat.keywords) {
+      const kw = keyword.toLowerCase();
+      if (normalized === kw) return cat.key;
+      if (kw.includes(' ') && normalized.includes(kw)) return cat.key;
+    }
+    // Single-word fallback for custom keywords
+    const words = normalized.split(/\s+/);
+    for (const word of words) {
+      for (const keyword of cat.keywords) {
+        if (word === keyword.toLowerCase()) return cat.key;
+      }
+    }
+  }
+
+  // Built-in exact match
   if (KEYWORD_MAP[normalized]) {
     return KEYWORD_MAP[normalized];
   }
 
-  // Multi-word phrase match (check if item contains a known phrase)
+  // Multi-word phrase match
   for (const [keyword, category] of Object.entries(KEYWORD_MAP)) {
     if (keyword.includes(' ') && normalized.includes(keyword)) {
       return category;
     }
   }
 
-  // Single-word match (check each word in the item name)
+  // Single-word match
   const words = normalized.split(/\s+/);
   for (const word of words) {
     if (KEYWORD_MAP[word]) {
@@ -262,4 +280,47 @@ export const categorizeItem = (itemName) => {
   }
 
   return CATEGORIES.OTHER;
+};
+
+/**
+ * Merges built-in category labels with custom category labels.
+ * @param {Array} customCategories - User-defined categories
+ * @returns {Object} Combined label map keyed by category key
+ */
+export const getAllCategoryLabels = (customCategories = []) => {
+  const merged = { ...CATEGORY_LABELS };
+  for (const cat of customCategories) {
+    merged[cat.key] = cat.name;
+  }
+  return merged;
+};
+
+/**
+ * Merges built-in category colors with custom category colors.
+ * @param {Array} customCategories - User-defined categories
+ * @returns {Object} Combined color map keyed by category key
+ */
+export const getAllCategoryColors = (customCategories = []) => {
+  const merged = { ...CATEGORY_COLORS };
+  for (const cat of customCategories) {
+    merged[cat.key] = cat.color;
+  }
+  return merged;
+};
+
+/**
+ * Returns the ordered list of all category keys (built-in + custom).
+ * @param {Array} customCategories - User-defined categories
+ * @returns {Array<string>} All category keys in display order
+ */
+export const getAllCategoryKeys = (customCategories = []) => {
+  const builtIn = Object.values(CATEGORIES);
+  const customKeys = customCategories.map((cat) => cat.key);
+  // Insert custom categories before "other"
+  const otherIndex = builtIn.indexOf(CATEGORIES.OTHER);
+  return [
+    ...builtIn.slice(0, otherIndex),
+    ...customKeys,
+    ...builtIn.slice(otherIndex),
+  ];
 };

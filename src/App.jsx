@@ -5,6 +5,7 @@ import { AddItemForm } from './components/AddItemForm.jsx';
 import { ShoppingList } from './components/ShoppingList.jsx';
 import { Suggestions } from './components/Suggestions.jsx';
 import { RecipePanel } from './components/RecipePanel.jsx';
+import { CategoryManager } from './components/CategoryManager.jsx';
 import styles from './App.module.css';
 
 /**
@@ -69,12 +70,20 @@ export const App = () => {
               <AddItemForm onAdd={handleAddItem} />
               <ShoppingList
                 items={activeList.items}
+                customCategories={state.customCategories}
                 onToggle={handleToggleItem}
                 onRemove={handleRemoveItem}
                 onClearChecked={handleClearChecked}
               />
               <Suggestions suggestions={suggestions} onAdd={handleAddItem} />
               <RecipePanel onAddItems={handleAddItems} />
+              <CategoryManager
+                customCategories={state.customCategories}
+                onAdd={actions.addCustomCategory}
+                onUpdate={actions.updateCustomCategory}
+                onDelete={actions.deleteCustomCategory}
+                onReorder={actions.reorderCustomCategories}
+              />
             </>
           ) : (
             <div className={styles.noList}>

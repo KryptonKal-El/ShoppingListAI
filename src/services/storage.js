@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   LISTS: 'shoppingListAI_lists',
   HISTORY: 'shoppingListAI_history',
   RECIPES: 'shoppingListAI_recipes',
+  CUSTOM_CATEGORIES: 'shoppingListAI_customCategories',
 };
 
 /**
@@ -54,3 +55,9 @@ export const loadRecipes = () => readStorage(STORAGE_KEYS.RECIPES, []);
 
 /** @param {Array} recipes - The recipes to persist */
 export const saveRecipes = (recipes) => writeStorage(STORAGE_KEYS.RECIPES, recipes);
+
+/** @returns {Array} Custom category definitions */
+export const loadCustomCategories = () => readStorage(STORAGE_KEYS.CUSTOM_CATEGORIES, []);
+
+/** @param {Array} categories - Custom categories to persist */
+export const saveCustomCategories = (categories) => writeStorage(STORAGE_KEYS.CUSTOM_CATEGORIES, categories);

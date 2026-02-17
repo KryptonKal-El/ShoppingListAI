@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
-import { CATEGORIES, CATEGORY_LABELS, CATEGORY_COLORS } from '../utils/categories.js';
+import { CATEGORIES, getAllCategoryLabels, getAllCategoryColors, getAllCategoryKeys } from '../utils/categories.js';
 import { ShoppingItem } from './ShoppingItem.jsx';
 import styles from './ShoppingList.module.css';
 
 /**
  * Displays the shopping list items grouped by category.
  * Unchecked items appear first, checked items at the bottom.
+ * Supports both built-in and custom categories.
  */
-export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
+export const ShoppingList = ({ items, customCategories, onToggle, onRemove, onClearChecked }) => {
   if (items.length === 0) {
     return (
       <div className={styles.empty}>
@@ -16,6 +17,10 @@ export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
       </div>
     );
   }
+
+  const allLabels = getAllCategoryLabels(customCategories);
+  const allColors = getAllCategoryColors(customCategories);
+  const categoryOrder = getAllCategoryKeys(customCategories);
 
   // Group items by category
   const grouped = {};
@@ -28,7 +33,6 @@ export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
   }
 
   const checkedItems = items.filter((i) => i.isChecked);
-  const categoryOrder = Object.values(CATEGORIES);
 
   return (
     <div className={styles.list}>
@@ -40,15 +44,16 @@ export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
             <h3 className={styles.groupTitle}>
               <span
                 className={styles.dot}
-                style={{ backgroundColor: CATEGORY_COLORS[cat] }}
+                style={{ backgroundColor: allColors[cat] ?? '#9e9e9e' }}
               />
-              {CATEGORY_LABELS[cat]}
+              {allLabels[cat] ?? cat}
               <span className={styles.count}>{group.length}</span>
             </h3>
             {group.map((item) => (
               <ShoppingItem
                 key={item.id}
                 item={item}
+                customCategories={customCategories}
                 onToggle={() => onToggle(item.id)}
                 onRemove={() => onRemove(item.id)}
               />
@@ -71,6 +76,7 @@ export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
             <ShoppingItem
               key={item.id}
               item={item}
+              customCategories={customCategories}
               onToggle={() => onToggle(item.id)}
               onRemove={() => onRemove(item.id)}
             />
@@ -83,7 +89,12 @@ export const ShoppingList = ({ items, onToggle, onRemove, onClearChecked }) => {
 
 ShoppingList.propTypes = {
   items: PropTypes.array.isRequired,
+  customCategories: PropTypes.array,
   onToggle: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onClearChecked: PropTypes.func.isRequired,
+};
+
+ShoppingList.defaultProps = {
+  customCategories: [],
 };

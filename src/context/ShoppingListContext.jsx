@@ -1,6 +1,6 @@
 import { createContext, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { loadLists, saveLists, loadHistory, saveHistory } from '../services/storage.js';
+import { loadLists, saveLists, loadHistory, saveHistory, loadCustomCategories, saveCustomCategories } from '../services/storage.js';
 import { categorizeItem } from '../utils/categories.js';
 
 /** Capitalizes the first letter of a string. */
@@ -21,12 +21,18 @@ const ACTION = {
   CLEAR_CHECKED: 'CLEAR_CHECKED',
   ADD_HISTORY: 'ADD_HISTORY',
   SET_HISTORY: 'SET_HISTORY',
+  SET_CUSTOM_CATEGORIES: 'SET_CUSTOM_CATEGORIES',
+  ADD_CUSTOM_CATEGORY: 'ADD_CUSTOM_CATEGORY',
+  UPDATE_CUSTOM_CATEGORY: 'UPDATE_CUSTOM_CATEGORY',
+  DELETE_CUSTOM_CATEGORY: 'DELETE_CUSTOM_CATEGORY',
+  REORDER_CUSTOM_CATEGORIES: 'REORDER_CUSTOM_CATEGORIES',
 };
 
 const initialState = {
   lists: [],
   activeListId: null,
   history: [],
+  customCategories: [],
 };
 
 const reducer = (state, action) => {
@@ -71,7 +77,7 @@ const reducer = (state, action) => {
       const newItem = {
         id: uuidv4(),
         name,
-        category: categorizeItem(name),
+        category: categorizeItem(name, state.customCategories),
         isChecked: false,
         addedAt: new Date().toISOString(),
       };
@@ -172,6 +178,43 @@ const reducer = (state, action) => {
       };
     }
 
+    case ACTION.SET_CUSTOM_CATEGORIES:
+      return { ...state, customCategories: action.payload };
+
+    case ACTION.ADD_CUSTOM_CATEGORY: {
+      const { name, color, keywords } = action.payload;
+      const newCategory = {
+        id: uuidv4(),
+        key: `custom_${Date.now()}`,
+        name,
+        color,
+        keywords: keywords ?? [],
+      };
+      return {
+        ...state,
+        customCategories: [...state.customCategories, newCategory],
+      };
+    }
+
+    case ACTION.UPDATE_CUSTOM_CATEGORY: {
+      const { id, updates } = action.payload;
+      return {
+        ...state,
+        customCategories: state.customCategories.map((cat) =>
+          cat.id === id ? { ...cat, ...updates } : cat
+        ),
+      };
+    }
+
+    case ACTION.DELETE_CUSTOM_CATEGORY:
+      return {
+        ...state,
+        customCategories: state.customCategories.filter((cat) => cat.id !== action.payload),
+      };
+
+    case ACTION.REORDER_CUSTOM_CATEGORIES:
+      return { ...state, customCategories: action.payload };
+
     default:
       return state;
   }
@@ -188,12 +231,16 @@ export const ShoppingListProvider = ({ children }) => {
   useEffect(() => {
     const lists = loadLists();
     const history = loadHistory();
+    const customCategories = loadCustomCategories();
     if (lists.length > 0) {
       dispatch({ type: ACTION.SET_LISTS, payload: lists });
       dispatch({ type: ACTION.SELECT_LIST, payload: lists[0].id });
     }
     if (history.length > 0) {
       dispatch({ type: ACTION.SET_HISTORY, payload: history });
+    }
+    if (customCategories.length > 0) {
+      dispatch({ type: ACTION.SET_CUSTOM_CATEGORIES, payload: customCategories });
     }
   }, []);
 
@@ -210,6 +257,11 @@ export const ShoppingListProvider = ({ children }) => {
       saveHistory(state.history);
     }
   }, [state.history]);
+
+  // Persist custom categories whenever they change
+  useEffect(() => {
+    saveCustomCategories(state.customCategories);
+  }, [state.customCategories]);
 
   const actions = {
     createList: (name) => dispatch({ type: ACTION.CREATE_LIST, payload: { name } }),
@@ -233,6 +285,14 @@ export const ShoppingListProvider = ({ children }) => {
       dispatch({ type: ACTION.UPDATE_ITEM, payload: { listId, itemId, updates } }),
     clearChecked: (listId) =>
       dispatch({ type: ACTION.CLEAR_CHECKED, payload: { listId } }),
+    addCustomCategory: (name, color, keywords) =>
+      dispatch({ type: ACTION.ADD_CUSTOM_CATEGORY, payload: { name, color, keywords } }),
+    updateCustomCategory: (id, updates) =>
+      dispatch({ type: ACTION.UPDATE_CUSTOM_CATEGORY, payload: { id, updates } }),
+    deleteCustomCategory: (id) =>
+      dispatch({ type: ACTION.DELETE_CUSTOM_CATEGORY, payload: id }),
+    reorderCustomCategories: (categories) =>
+      dispatch({ type: ACTION.REORDER_CUSTOM_CATEGORIES, payload: categories }),
   };
 
   const activeList = state.lists.find((l) => l.id === state.activeListId) ?? null;
