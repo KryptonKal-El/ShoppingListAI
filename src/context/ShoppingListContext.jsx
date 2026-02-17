@@ -3,6 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { loadLists, saveLists, loadHistory, saveHistory } from '../services/storage.js';
 import { categorizeItem } from '../utils/categories.js';
 
+/** Capitalizes the first letter of a string. */
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
 export const ShoppingListContext = createContext(null);
 
 const ACTION = {
@@ -63,7 +66,8 @@ const reducer = (state, action) => {
       return { ...state, activeListId: action.payload };
 
     case ACTION.ADD_ITEM: {
-      const { listId, name } = action.payload;
+      const { listId, name: rawName } = action.payload;
+      const name = capitalize(rawName.trim());
       const newItem = {
         id: uuidv4(),
         name,
@@ -83,11 +87,15 @@ const reducer = (state, action) => {
 
     case ACTION.ADD_ITEMS: {
       const { listId, items } = action.payload;
+      const capitalizedItems = items.map((item) => ({
+        ...item,
+        name: capitalize(item.name.trim()),
+      }));
       return {
         ...state,
         lists: state.lists.map((list) =>
           list.id === listId
-            ? { ...list, items: [...list.items, ...items] }
+            ? { ...list, items: [...list.items, ...capitalizedItems] }
             : list
         ),
       };
@@ -155,7 +163,7 @@ const reducer = (state, action) => {
 
     case ACTION.ADD_HISTORY: {
       const newEntry = {
-        name: action.payload.name,
+        name: capitalize(action.payload.name.trim()),
         addedAt: new Date().toISOString(),
       };
       return {
