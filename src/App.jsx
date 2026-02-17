@@ -1,5 +1,7 @@
 import { useShoppingList } from './hooks/useShoppingList.js';
+import { useAuth } from './context/AuthContext.jsx';
 import { getSuggestions } from './services/suggestions.js';
+import { Login } from './components/Login.jsx';
 import { ListSelector } from './components/ListSelector.jsx';
 import { AddItemForm } from './components/AddItemForm.jsx';
 import { ShoppingList } from './components/ShoppingList.jsx';
@@ -10,9 +12,11 @@ import styles from './App.module.css';
 
 /**
  * Root application component.
+ * Gates content behind authentication.
  * Composes the list selector, item form, shopping list, suggestions, and recipe panel.
  */
 export const App = () => {
+  const { user, isLoading, signOut } = useAuth();
   const { state, actions, activeList } = useShoppingList();
 
   const suggestions = getSuggestions(
@@ -45,11 +49,30 @@ export const App = () => {
     actions.clearChecked(activeList.id);
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.loading}>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
   return (
     <div className={styles.app}>
       <header className={styles.header}>
         <h1 className={styles.logo}>ShoppingList<span className={styles.ai}>AI</span></h1>
-        <p className={styles.tagline}>Smart grocery lists powered by AI</p>
+        <div className={styles.headerRight}>
+          <span className={styles.userName}>
+            {user.isAnonymous ? 'Guest' : user.displayName ?? user.email}
+          </span>
+          <button className={styles.signOutBtn} onClick={signOut} type="button">
+            Sign out
+          </button>
+        </div>
       </header>
 
       <main className={styles.main}>

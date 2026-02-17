@@ -1,0 +1,208 @@
+/**
+ * Firestore service layer for ShoppingListAI.
+ * All data is scoped under users/{userId}/ for per-user isolation.
+ * Provides CRUD operations and real-time snapshot listeners.
+ */
+import {
+  collection,
+  doc,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+  writeBatch,
+} from 'firebase/firestore';
+import { db } from './firebase.js';
+
+// ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
+
+const userDoc = (userId) => doc(db, 'users', userId);
+const listsCol = (userId) => collection(db, 'users', userId, 'lists');
+const listDoc = (userId, listId) => doc(db, 'users', userId, 'lists', listId);
+const itemsCol = (userId, listId) => collection(db, 'users', userId, 'lists', listId, 'items');
+const itemDoc = (userId, listId, itemId) => doc(db, 'users', userId, 'lists', listId, 'items', itemId);
+const historyCol = (userId) => collection(db, 'users', userId, 'history');
+const categoriesCol = (userId) => collection(db, 'users', userId, 'customCategories');
+const categoryDoc = (userId, catId) => doc(db, 'users', userId, 'customCategories', catId);
+
+// ---------------------------------------------------------------------------
+// Lists
+// ---------------------------------------------------------------------------
+
+/** Creates a new shopping list document. Returns the generated ID. */
+export const createList = async (userId, name) => {
+  const ref = await addDoc(listsCol(userId), {
+    name,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+};
+
+/** Deletes a shopping list and all its items (subcollection). */
+export const deleteList = async (userId, listId) => {
+  // Firestore doesn't cascade-delete subcollections, so we batch-delete items first
+  const batch = writeBatch(db);
+  const itemsRef = itemsCol(userId, listId);
+  // We subscribe briefly to get all item docs, then unsubscribe
+  const snapshot = await new Promise((resolve) => {
+    const unsub = onSnapshot(itemsRef, (snap) => {
+      unsub();
+      resolve(snap);
+    });
+  });
+  snapshot.docs.forEach((d) => batch.delete(d.ref));
+  batch.delete(listDoc(userId, listId));
+  await batch.commit();
+};
+
+/**
+ * Subscribes to all lists for a user in real-time.
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeLists = (userId, callback) => {
+  const q = query(listsCol(userId), orderBy('createdAt', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const lists = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    callback(lists);
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Items (subcollection of a list)
+// ---------------------------------------------------------------------------
+
+/** Adds a single item to a list. Returns the generated ID. */
+export const addItem = async (userId, listId, item) => {
+  const ref = await addDoc(itemsCol(userId, listId), {
+    ...item,
+    addedAt: serverTimestamp(),
+  });
+  return ref.id;
+};
+
+/** Adds multiple items to a list in a batch. */
+export const addItems = async (userId, listId, items) => {
+  const batch = writeBatch(db);
+  for (const item of items) {
+    const ref = doc(itemsCol(userId, listId));
+    batch.set(ref, { ...item, addedAt: serverTimestamp() });
+  }
+  await batch.commit();
+};
+
+/** Updates fields on a single item. */
+export const updateItem = async (userId, listId, itemId, updates) => {
+  await updateDoc(itemDoc(userId, listId, itemId), updates);
+};
+
+/** Deletes a single item. */
+export const removeItem = async (userId, listId, itemId) => {
+  await deleteDoc(itemDoc(userId, listId, itemId));
+};
+
+/** Deletes all checked items from a list in a batch. */
+export const clearCheckedItems = async (userId, listId, checkedItemIds) => {
+  const batch = writeBatch(db);
+  for (const id of checkedItemIds) {
+    batch.delete(itemDoc(userId, listId, id));
+  }
+  await batch.commit();
+};
+
+/**
+ * Subscribes to all items in a list in real-time.
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeItems = (userId, listId, callback) => {
+  const q = query(itemsCol(userId, listId), orderBy('addedAt', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const items = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    callback(items);
+  });
+};
+
+// ---------------------------------------------------------------------------
+// History
+// ---------------------------------------------------------------------------
+
+/** Adds a history entry. */
+export const addHistoryEntry = async (userId, name) => {
+  await addDoc(historyCol(userId), {
+    name,
+    addedAt: serverTimestamp(),
+  });
+};
+
+/**
+ * Subscribes to the user's item history in real-time.
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeHistory = (userId, callback) => {
+  const q = query(historyCol(userId), orderBy('addedAt', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const history = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    callback(history);
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Custom Categories
+// ---------------------------------------------------------------------------
+
+/** Creates a new custom category. Returns the generated ID. */
+export const createCustomCategory = async (userId, category) => {
+  const ref = await addDoc(categoriesCol(userId), {
+    ...category,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+};
+
+/** Updates a custom category. */
+export const updateCustomCategory = async (userId, catId, updates) => {
+  await updateDoc(categoryDoc(userId, catId), updates);
+};
+
+/** Deletes a custom category. */
+export const deleteCustomCategory = async (userId, catId) => {
+  await deleteDoc(categoryDoc(userId, catId));
+};
+
+/** Saves the full ordered array of custom categories (for reordering). */
+export const saveCustomCategoryOrder = async (userId, categories) => {
+  const batch = writeBatch(db);
+  categories.forEach((cat, index) => {
+    batch.update(categoryDoc(userId, cat.id), { order: index });
+  });
+  await batch.commit();
+};
+
+/**
+ * Subscribes to custom categories in real-time.
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeCustomCategories = (userId, callback) => {
+  const q = query(categoriesCol(userId), orderBy('order', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const categories = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    callback(categories);
+  });
+};

@@ -1,301 +1,234 @@
-import { createContext, useReducer, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { loadLists, saveLists, loadHistory, saveHistory, loadCustomCategories, saveCustomCategories } from '../services/storage.js';
+/**
+ * Shopping list state management backed by Firestore.
+ * Real-time listeners push data into state. Actions call Firestore directly.
+ * All data is scoped to the authenticated user.
+ */
+import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { categorizeItem } from '../utils/categories.js';
+import { useAuth } from './AuthContext.jsx';
+import {
+  subscribeLists,
+  subscribeItems,
+  subscribeHistory,
+  subscribeCustomCategories,
+  createList as fsCreateList,
+  deleteList as fsDeleteList,
+  addItem as fsAddItem,
+  addItems as fsAddItems,
+  updateItem as fsUpdateItem,
+  removeItem as fsRemoveItem,
+  clearCheckedItems,
+  addHistoryEntry,
+  createCustomCategory,
+  updateCustomCategory as fsUpdateCustomCategory,
+  deleteCustomCategory as fsDeleteCustomCategory,
+  saveCustomCategoryOrder,
+} from '../services/firestore.js';
 
 /** Capitalizes the first letter of a string. */
 const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const ShoppingListContext = createContext(null);
 
-const ACTION = {
-  SET_LISTS: 'SET_LISTS',
-  CREATE_LIST: 'CREATE_LIST',
-  DELETE_LIST: 'DELETE_LIST',
-  SELECT_LIST: 'SELECT_LIST',
-  ADD_ITEM: 'ADD_ITEM',
-  ADD_ITEMS: 'ADD_ITEMS',
-  TOGGLE_ITEM: 'TOGGLE_ITEM',
-  REMOVE_ITEM: 'REMOVE_ITEM',
-  UPDATE_ITEM: 'UPDATE_ITEM',
-  CLEAR_CHECKED: 'CLEAR_CHECKED',
-  ADD_HISTORY: 'ADD_HISTORY',
-  SET_HISTORY: 'SET_HISTORY',
-  SET_CUSTOM_CATEGORIES: 'SET_CUSTOM_CATEGORIES',
-  ADD_CUSTOM_CATEGORY: 'ADD_CUSTOM_CATEGORY',
-  UPDATE_CUSTOM_CATEGORY: 'UPDATE_CUSTOM_CATEGORY',
-  DELETE_CUSTOM_CATEGORY: 'DELETE_CUSTOM_CATEGORY',
-  REORDER_CUSTOM_CATEGORIES: 'REORDER_CUSTOM_CATEGORIES',
-};
-
-const initialState = {
-  lists: [],
-  activeListId: null,
-  history: [],
-  customCategories: [],
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case ACTION.SET_LISTS:
-      return { ...state, lists: action.payload };
-
-    case ACTION.SET_HISTORY:
-      return { ...state, history: action.payload };
-
-    case ACTION.CREATE_LIST: {
-      const newList = {
-        id: uuidv4(),
-        name: action.payload.name,
-        items: [],
-        createdAt: new Date().toISOString(),
-      };
-      return {
-        ...state,
-        lists: [...state.lists, newList],
-        activeListId: newList.id,
-      };
-    }
-
-    case ACTION.DELETE_LIST: {
-      const filtered = state.lists.filter((l) => l.id !== action.payload);
-      return {
-        ...state,
-        lists: filtered,
-        activeListId: state.activeListId === action.payload
-          ? (filtered[0]?.id ?? null)
-          : state.activeListId,
-      };
-    }
-
-    case ACTION.SELECT_LIST:
-      return { ...state, activeListId: action.payload };
-
-    case ACTION.ADD_ITEM: {
-      const { listId, name: rawName } = action.payload;
-      const name = capitalize(rawName.trim());
-      const newItem = {
-        id: uuidv4(),
-        name,
-        category: categorizeItem(name, state.customCategories),
-        isChecked: false,
-        addedAt: new Date().toISOString(),
-      };
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? { ...list, items: [...list.items, newItem] }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.ADD_ITEMS: {
-      const { listId, items } = action.payload;
-      const capitalizedItems = items.map((item) => ({
-        ...item,
-        name: capitalize(item.name.trim()),
-      }));
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? { ...list, items: [...list.items, ...capitalizedItems] }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.TOGGLE_ITEM: {
-      const { listId, itemId } = action.payload;
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? {
-                ...list,
-                items: list.items.map((item) =>
-                  item.id === itemId
-                    ? { ...item, isChecked: !item.isChecked }
-                    : item
-                ),
-              }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.REMOVE_ITEM: {
-      const { listId, itemId } = action.payload;
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? { ...list, items: list.items.filter((i) => i.id !== itemId) }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.UPDATE_ITEM: {
-      const { listId, itemId, updates } = action.payload;
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? {
-                ...list,
-                items: list.items.map((item) =>
-                  item.id === itemId ? { ...item, ...updates } : item
-                ),
-              }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.CLEAR_CHECKED: {
-      const { listId } = action.payload;
-      return {
-        ...state,
-        lists: state.lists.map((list) =>
-          list.id === listId
-            ? { ...list, items: list.items.filter((i) => !i.isChecked) }
-            : list
-        ),
-      };
-    }
-
-    case ACTION.ADD_HISTORY: {
-      const newEntry = {
-        name: capitalize(action.payload.name.trim()),
-        addedAt: new Date().toISOString(),
-      };
-      return {
-        ...state,
-        history: [...state.history, newEntry].slice(-200), // keep last 200
-      };
-    }
-
-    case ACTION.SET_CUSTOM_CATEGORIES:
-      return { ...state, customCategories: action.payload };
-
-    case ACTION.ADD_CUSTOM_CATEGORY: {
-      const { name, color, keywords } = action.payload;
-      const newCategory = {
-        id: uuidv4(),
-        key: `custom_${Date.now()}`,
-        name,
-        color,
-        keywords: keywords ?? [],
-      };
-      return {
-        ...state,
-        customCategories: [...state.customCategories, newCategory],
-      };
-    }
-
-    case ACTION.UPDATE_CUSTOM_CATEGORY: {
-      const { id, updates } = action.payload;
-      return {
-        ...state,
-        customCategories: state.customCategories.map((cat) =>
-          cat.id === id ? { ...cat, ...updates } : cat
-        ),
-      };
-    }
-
-    case ACTION.DELETE_CUSTOM_CATEGORY:
-      return {
-        ...state,
-        customCategories: state.customCategories.filter((cat) => cat.id !== action.payload),
-      };
-
-    case ACTION.REORDER_CUSTOM_CATEGORIES:
-      return { ...state, customCategories: action.payload };
-
-    default:
-      return state;
-  }
-};
-
 /**
  * Provides shopping list state and actions to the component tree.
- * Persists data to localStorage on every state change.
+ * Subscribes to Firestore real-time listeners scoped to the current user.
  */
 export const ShoppingListProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const { user } = useAuth();
+  const userId = user?.uid ?? null;
 
-  // Load persisted data on mount
+  const [lists, setLists] = useState([]);
+  const [activeListId, setActiveListId] = useState(null);
+  const [activeItems, setActiveItems] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
+
+  // Track whether we've auto-selected a list on initial load
+  const hasAutoSelected = useRef(false);
+
+  // Subscribe to lists
   useEffect(() => {
-    const lists = loadLists();
-    const history = loadHistory();
-    const customCategories = loadCustomCategories();
-    if (lists.length > 0) {
-      dispatch({ type: ACTION.SET_LISTS, payload: lists });
-      dispatch({ type: ACTION.SELECT_LIST, payload: lists[0].id });
+    if (!userId) {
+      setLists([]);
+      setActiveListId(null);
+      hasAutoSelected.current = false;
+      return;
     }
-    if (history.length > 0) {
-      dispatch({ type: ACTION.SET_HISTORY, payload: history });
+    return subscribeLists(userId, (newLists) => {
+      setLists(newLists);
+      // Auto-select first list on initial load
+      if (!hasAutoSelected.current && newLists.length > 0) {
+        setActiveListId(newLists[0].id);
+        hasAutoSelected.current = true;
+      }
+    });
+  }, [userId]);
+
+  // Subscribe to items of the active list
+  useEffect(() => {
+    if (!userId || !activeListId) {
+      setActiveItems([]);
+      return;
     }
-    if (customCategories.length > 0) {
-      dispatch({ type: ACTION.SET_CUSTOM_CATEGORIES, payload: customCategories });
+    return subscribeItems(userId, activeListId, setActiveItems);
+  }, [userId, activeListId]);
+
+  // Subscribe to history
+  useEffect(() => {
+    if (!userId) {
+      setHistory([]);
+      return;
     }
+    return subscribeHistory(userId, setHistory);
+  }, [userId]);
+
+  // Subscribe to custom categories
+  useEffect(() => {
+    if (!userId) {
+      setCustomCategories([]);
+      return;
+    }
+    return subscribeCustomCategories(userId, setCustomCategories);
+  }, [userId]);
+
+  // -----------------------------------------------------------------------
+  // Actions (same API surface as before)
+  // -----------------------------------------------------------------------
+
+  const createListAction = useCallback(async (name) => {
+    if (!userId) return;
+    const newId = await fsCreateList(userId, name);
+    setActiveListId(newId);
+  }, [userId]);
+
+  const deleteListAction = useCallback(async (id) => {
+    if (!userId) return;
+    await fsDeleteList(userId, id);
+    if (activeListId === id) {
+      setActiveListId((prev) => {
+        const remaining = lists.filter((l) => l.id !== id);
+        return remaining[0]?.id ?? null;
+      });
+    }
+  }, [userId, activeListId, lists]);
+
+  const selectListAction = useCallback((id) => {
+    setActiveListId(id);
   }, []);
 
-  // Persist lists whenever they change
-  useEffect(() => {
-    if (state.lists.length > 0) {
-      saveLists(state.lists);
+  const addItemAction = useCallback(async (listId, rawName) => {
+    if (!userId) return;
+    const name = capitalize(rawName.trim());
+    const item = {
+      name,
+      category: categorizeItem(name, customCategories),
+      isChecked: false,
+    };
+    await fsAddItem(userId, listId, item);
+    await addHistoryEntry(userId, name);
+  }, [userId, customCategories]);
+
+  const addItemsAction = useCallback(async (listId, items) => {
+    if (!userId) return;
+    const prepared = items.map((item) => {
+      const name = capitalize(item.name.trim());
+      return {
+        name,
+        category: item.category ?? categorizeItem(name, customCategories),
+        isChecked: false,
+      };
+    });
+    await fsAddItems(userId, listId, prepared);
+    for (const item of prepared) {
+      await addHistoryEntry(userId, item.name);
     }
-  }, [state.lists]);
+  }, [userId, customCategories]);
 
-  // Persist history whenever it changes
-  useEffect(() => {
-    if (state.history.length > 0) {
-      saveHistory(state.history);
-    }
-  }, [state.history]);
+  const toggleItemAction = useCallback(async (listId, itemId) => {
+    if (!userId) return;
+    const item = activeItems.find((i) => i.id === itemId);
+    if (!item) return;
+    await fsUpdateItem(userId, listId, itemId, { isChecked: !item.isChecked });
+  }, [userId, activeItems]);
 
-  // Persist custom categories whenever they change
-  useEffect(() => {
-    saveCustomCategories(state.customCategories);
-  }, [state.customCategories]);
+  const removeItemAction = useCallback(async (listId, itemId) => {
+    if (!userId) return;
+    await fsRemoveItem(userId, listId, itemId);
+  }, [userId]);
 
-  const actions = {
-    createList: (name) => dispatch({ type: ACTION.CREATE_LIST, payload: { name } }),
-    deleteList: (id) => dispatch({ type: ACTION.DELETE_LIST, payload: id }),
-    selectList: (id) => dispatch({ type: ACTION.SELECT_LIST, payload: id }),
-    addItem: (listId, name) => {
-      dispatch({ type: ACTION.ADD_ITEM, payload: { listId, name } });
-      dispatch({ type: ACTION.ADD_HISTORY, payload: { name } });
-    },
-    addItems: (listId, items) => {
-      dispatch({ type: ACTION.ADD_ITEMS, payload: { listId, items } });
-      for (const item of items) {
-        dispatch({ type: ACTION.ADD_HISTORY, payload: { name: item.name } });
-      }
-    },
-    toggleItem: (listId, itemId) =>
-      dispatch({ type: ACTION.TOGGLE_ITEM, payload: { listId, itemId } }),
-    removeItem: (listId, itemId) =>
-      dispatch({ type: ACTION.REMOVE_ITEM, payload: { listId, itemId } }),
-    updateItem: (listId, itemId, updates) =>
-      dispatch({ type: ACTION.UPDATE_ITEM, payload: { listId, itemId, updates } }),
-    clearChecked: (listId) =>
-      dispatch({ type: ACTION.CLEAR_CHECKED, payload: { listId } }),
-    addCustomCategory: (name, color, keywords) =>
-      dispatch({ type: ACTION.ADD_CUSTOM_CATEGORY, payload: { name, color, keywords } }),
-    updateCustomCategory: (id, updates) =>
-      dispatch({ type: ACTION.UPDATE_CUSTOM_CATEGORY, payload: { id, updates } }),
-    deleteCustomCategory: (id) =>
-      dispatch({ type: ACTION.DELETE_CUSTOM_CATEGORY, payload: id }),
-    reorderCustomCategories: (categories) =>
-      dispatch({ type: ACTION.REORDER_CUSTOM_CATEGORIES, payload: categories }),
+  const updateItemAction = useCallback(async (listId, itemId, updates) => {
+    if (!userId) return;
+    await fsUpdateItem(userId, listId, itemId, updates);
+  }, [userId]);
+
+  const clearCheckedAction = useCallback(async (listId) => {
+    if (!userId) return;
+    const checkedIds = activeItems.filter((i) => i.isChecked).map((i) => i.id);
+    if (checkedIds.length === 0) return;
+    await clearCheckedItems(userId, listId, checkedIds);
+  }, [userId, activeItems]);
+
+  const addCustomCategoryAction = useCallback(async (name, color, keywords) => {
+    if (!userId) return;
+    const key = `custom_${Date.now()}`;
+    await createCustomCategory(userId, {
+      key,
+      name,
+      color,
+      keywords: keywords ?? [],
+      order: customCategories.length,
+    });
+  }, [userId, customCategories.length]);
+
+  const updateCustomCategoryAction = useCallback(async (id, updates) => {
+    if (!userId) return;
+    await fsUpdateCustomCategory(userId, id, updates);
+  }, [userId]);
+
+  const deleteCustomCategoryAction = useCallback(async (id) => {
+    if (!userId) return;
+    await fsDeleteCustomCategory(userId, id);
+  }, [userId]);
+
+  const reorderCustomCategoriesAction = useCallback(async (categories) => {
+    if (!userId) return;
+    setCustomCategories(categories); // optimistic update for smooth drag
+    await saveCustomCategoryOrder(userId, categories);
+  }, [userId]);
+
+  // -----------------------------------------------------------------------
+  // Build the context value matching the old API shape
+  // -----------------------------------------------------------------------
+
+  const state = {
+    lists,
+    activeListId,
+    history,
+    customCategories,
   };
 
-  const activeList = state.lists.find((l) => l.id === state.activeListId) ?? null;
+  const actions = {
+    createList: createListAction,
+    deleteList: deleteListAction,
+    selectList: selectListAction,
+    addItem: addItemAction,
+    addItems: addItemsAction,
+    toggleItem: toggleItemAction,
+    removeItem: removeItemAction,
+    updateItem: updateItemAction,
+    clearChecked: clearCheckedAction,
+    addCustomCategory: addCustomCategoryAction,
+    updateCustomCategory: updateCustomCategoryAction,
+    deleteCustomCategory: deleteCustomCategoryAction,
+    reorderCustomCategories: reorderCustomCategoriesAction,
+  };
+
+  // Build activeList object matching old shape (list + its items)
+  const activeListMeta = lists.find((l) => l.id === activeListId) ?? null;
+  const activeList = activeListMeta
+    ? { ...activeListMeta, items: activeItems }
+    : null;
 
   return (
     <ShoppingListContext.Provider value={{ state, actions, activeList }}>

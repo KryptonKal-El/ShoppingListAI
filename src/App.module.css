@@ -6,7 +6,9 @@
 }
 
 .header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1.5rem 0 1rem;
 }
 
@@ -20,6 +22,42 @@
 .ai {
   color: #4caf50;
   font-weight: 800;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userName {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.signOutBtn {
+  font-size: 0.8rem;
+  color: #e53935;
+  background: none;
+  border: 1px solid #e53935;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.signOutBtn:hover {
+  background: #e53935;
+  color: white;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #999;
+  font-size: 1.1rem;
 }
 
 .tagline {
