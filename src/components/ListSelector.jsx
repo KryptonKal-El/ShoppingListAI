@@ -5,12 +5,14 @@ import styles from './ListSelector.module.css';
 
 /**
  * Sidebar/dropdown for managing multiple shopping lists.
- * Shows all lists, allows creating new ones, and switching between them.
+ * Shows all lists, allows creating new ones, renaming, and switching between them.
  */
-export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete }) => {
+export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onRename, onDelete }) => {
   const [newName, setNewName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState('');
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -19,6 +21,26 @@ export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete
     onCreate(trimmed);
     setNewName('');
     setIsCreating(false);
+  };
+
+  const handleStartEdit = (list) => {
+    setEditingId(list.id);
+    setEditName(list.name);
+  };
+
+  const handleSaveEdit = (id) => {
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      setEditingId(null);
+      return;
+    }
+    onRename(id, trimmed);
+    setEditingId(null);
+  };
+
+  const handleEditKeyDown = (e, id) => {
+    if (e.key === 'Enter') handleSaveEdit(id);
+    if (e.key === 'Escape') setEditingId(null);
   };
 
   return (
@@ -58,29 +80,54 @@ export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete
             key={list.id}
             className={`${styles.listItem} ${list.id === activeListId ? styles.active : ''}`}
           >
-            <button
-              className={styles.listBtn}
-              onClick={() => onSelect(list.id)}
-            >
-              <span className={styles.listName}>{list.name}</span>
-              <span className={styles.listCount}>{list.items?.length ?? 0} items</span>
-            </button>
-            <button
-              className={styles.deleteBtn}
-              onClick={() => setConfirmingDeleteId(list.id)}
-              aria-label={`Delete ${list.name}`}
-            >
-              x
-            </button>
-            {confirmingDeleteId === list.id && (
-              <ConfirmDialog
-                message={`Delete "${list.name}" and all its items?`}
-                onConfirm={() => {
-                  onDelete(list.id);
-                  setConfirmingDeleteId(null);
-                }}
-                onCancel={() => setConfirmingDeleteId(null)}
-              />
+            {editingId === list.id ? (
+              <div className={styles.editRow}>
+                <input
+                  className={styles.editInput}
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => handleEditKeyDown(e, list.id)}
+                  onBlur={() => handleSaveEdit(list.id)}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <>
+                <button
+                  className={styles.listBtn}
+                  onClick={() => onSelect(list.id)}
+                  onDoubleClick={() => handleStartEdit(list)}
+                >
+                  <span className={styles.listName}>{list.name}</span>
+                  <span className={styles.listCount}>{list.items?.length ?? 0} items</span>
+                </button>
+                <button
+                  className={styles.editBtn}
+                  onClick={() => handleStartEdit(list)}
+                  aria-label={`Rename ${list.name}`}
+                  title="Rename"
+                >
+                  ✎
+                </button>
+                <button
+                  className={styles.deleteBtn}
+                  onClick={() => setConfirmingDeleteId(list.id)}
+                  aria-label={`Delete ${list.name}`}
+                >
+                  x
+                </button>
+                {confirmingDeleteId === list.id && (
+                  <ConfirmDialog
+                    message={`Delete "${list.name}" and all its items?`}
+                    onConfirm={() => {
+                      onDelete(list.id);
+                      setConfirmingDeleteId(null);
+                    }}
+                    onCancel={() => setConfirmingDeleteId(null)}
+                  />
+                )}
+              </>
             )}
           </div>
         ))}
@@ -94,5 +141,6 @@ ListSelector.propTypes = {
   activeListId: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
+  onRename: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

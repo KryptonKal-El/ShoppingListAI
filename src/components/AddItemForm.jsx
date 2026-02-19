@@ -1,33 +1,161 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from './AddItemForm.module.css';
 
 /**
- * Form for adding new items to the shopping list.
- * Includes an input field, optional store selector, and submit button.
+ * Derives a deduplicated, sorted list of unique item names from history.
+ * @param {Array<{name: string}>} history
+ * @returns {string[]}
  */
-export const AddItemForm = ({ stores, onAdd }) => {
+const getUniqueNames = (history) => {
+  const seen = new Set();
+  const names = [];
+  for (const entry of history) {
+    const lower = entry.name.toLowerCase();
+    if (!seen.has(lower)) {
+      seen.add(lower);
+      names.push(entry.name);
+    }
+  }
+  return names.sort((a, b) => a.localeCompare(b));
+};
+
+/**
+ * Form for adding new items to the shopping list.
+ * Includes an input field with autocomplete from history,
+ * optional store selector, and submit button.
+ */
+export const AddItemForm = ({ stores, history, onAdd }) => {
   const [value, setValue] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const wrapperRef = useRef(null);
+  const listRef = useRef(null);
+
+  const uniqueNames = useMemo(() => getUniqueNames(history), [history]);
+
+  const suggestions = useMemo(() => {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed) return [];
+    return uniqueNames.filter((name) => name.toLowerCase().includes(trimmed));
+  }, [value, uniqueNames]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Scroll highlighted item into view
+  useEffect(() => {
+    if (highlightedIndex < 0 || !listRef.current) return;
+    const items = listRef.current.children;
+    if (items[highlightedIndex]) {
+      items[highlightedIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }, [highlightedIndex]);
+
+  const handleSelect = (name) => {
+    setValue(name);
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
+  };
+
+  const [selectedAisle, setSelectedAisle] = useState('');
+
+  // Find aisles for the currently selected store
+  const selectedStoreObj = selectedStore
+    ? stores.find((s) => s.id === selectedStore)
+    : null;
+  const availableAisles = selectedStoreObj?.aisles ?? [];
+
+  // Reset aisle when store changes
+  const prevStoreRef = useRef(selectedStore);
+  useEffect(() => {
+    if (prevStoreRef.current !== selectedStore) {
+      setSelectedAisle('');
+      prevStoreRef.current = selectedStore;
+    }
+  }, [selectedStore]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = value.trim();
     if (!trimmed) return;
-    onAdd(trimmed, selectedStore || null);
+    onAdd(trimmed, selectedStore || null, selectedAisle || null);
     setValue('');
+    setSelectedAisle('');
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
   };
+
+  const handleInputChange = (e) => {
+    setValue(e.target.value);
+    setIsDropdownOpen(true);
+    setHighlightedIndex(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!isDropdownOpen || suggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev < suggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev > 0 ? prev - 1 : suggestions.length - 1
+      );
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      handleSelect(suggestions[highlightedIndex]);
+    } else if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+      setHighlightedIndex(-1);
+    }
+  };
+
+  const showDropdown = isDropdownOpen && suggestions.length > 0;
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <input
-        className={styles.input}
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Add an item..."
-        aria-label="New item name"
-      />
+      <div className={styles.inputWrapper} ref={wrapperRef}>
+        <input
+          className={styles.input}
+          type="text"
+          value={value}
+          onChange={handleInputChange}
+          onFocus={() => value.trim() && setIsDropdownOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder="Add an item..."
+          aria-label="New item name"
+          autoComplete="off"
+        />
+        {showDropdown && (
+          <ul className={styles.dropdown} ref={listRef} role="listbox">
+            {suggestions.map((name, index) => (
+              <li
+                key={name}
+                role="option"
+                aria-selected={index === highlightedIndex}
+                className={`${styles.dropdownItem} ${index === highlightedIndex ? styles.highlighted : ''}`}
+                onMouseDown={() => handleSelect(name)}
+                onMouseEnter={() => setHighlightedIndex(index)}
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       {stores.length > 0 && (
         <select
           className={styles.storeSelect}
@@ -43,6 +171,21 @@ export const AddItemForm = ({ stores, onAdd }) => {
           ))}
         </select>
       )}
+      {availableAisles.length > 0 && (
+        <select
+          className={styles.aisleSelect}
+          value={selectedAisle}
+          onChange={(e) => setSelectedAisle(e.target.value)}
+          aria-label="Assign to aisle"
+        >
+          <option value="">No aisle</option>
+          {availableAisles.map((aisle) => (
+            <option key={aisle} value={aisle}>
+              {aisle}
+            </option>
+          ))}
+        </select>
+      )}
       <button className={styles.button} type="submit" disabled={!value.trim()}>
         Add
       </button>
@@ -52,9 +195,11 @@ export const AddItemForm = ({ stores, onAdd }) => {
 
 AddItemForm.propTypes = {
   stores: PropTypes.array,
+  history: PropTypes.array,
   onAdd: PropTypes.func.isRequired,
 };
 
 AddItemForm.defaultProps = {
   stores: [],
+  history: [],
 };

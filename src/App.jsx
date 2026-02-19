@@ -26,9 +26,9 @@ export const App = () => {
     activeList?.items ?? [],
   );
 
-  const handleAddItem = (name, storeId = null) => {
+  const handleAddItem = (name, storeId = null, aisle = null) => {
     if (!activeList) return;
-    actions.addItem(activeList.id, name, storeId);
+    actions.addItem(activeList.id, name, storeId, aisle);
   };
 
   const handleAddItems = (items) => {
@@ -59,6 +59,11 @@ export const App = () => {
   const handleUpdateStore = (itemId, newStoreId) => {
     if (!activeList) return;
     actions.updateItem(activeList.id, itemId, { store: newStoreId });
+  };
+
+  const handleUpdateAisle = (itemId, newAisle) => {
+    if (!activeList) return;
+    actions.updateItem(activeList.id, itemId, { aisle: newAisle });
   };
 
   if (isLoading) {
@@ -94,6 +99,7 @@ export const App = () => {
             activeListId={state.activeListId}
             onSelect={actions.selectList}
             onCreate={actions.createList}
+            onRename={actions.renameList}
             onDelete={actions.deleteList}
           />
         </aside>
@@ -102,7 +108,7 @@ export const App = () => {
           {activeList ? (
             <>
               <h2 className={styles.listTitle}>{activeList.name}</h2>
-              <AddItemForm stores={state.stores} onAdd={handleAddItem} />
+              <AddItemForm stores={state.stores} history={state.history} onAdd={handleAddItem} />
               <ShoppingList
                 items={activeList.items}
                 customCategories={state.customCategories}
@@ -111,6 +117,7 @@ export const App = () => {
                 onRemove={handleRemoveItem}
                 onUpdateCategory={handleUpdateCategory}
                 onUpdateStore={handleUpdateStore}
+                onUpdateAisle={handleUpdateAisle}
                 onClearChecked={handleClearChecked}
               />
               <Suggestions suggestions={suggestions} onAdd={handleAddItem} />

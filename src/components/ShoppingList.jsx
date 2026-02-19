@@ -19,6 +19,7 @@ const CategoryGroup = ({
   onRemove,
   onUpdateCategory,
   onUpdateStore,
+  onUpdateAisle,
 }) => (
   <>
     {categoryOrder.map((cat) => {
@@ -44,6 +45,7 @@ const CategoryGroup = ({
               onRemove={() => onRemove(item.id)}
               onUpdateCategory={onUpdateCategory}
               onUpdateStore={onUpdateStore}
+              onUpdateAisle={onUpdateAisle}
             />
           ))}
         </div>
@@ -78,6 +80,7 @@ export const ShoppingList = ({
   onRemove,
   onUpdateCategory,
   onUpdateStore,
+  onUpdateAisle,
   onClearChecked,
 }) => {
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
@@ -129,6 +132,7 @@ export const ShoppingList = ({
     onRemove,
     onUpdateCategory,
     onUpdateStore,
+    onUpdateAisle,
   };
 
   return (
@@ -203,6 +207,7 @@ export const ShoppingList = ({
               onRemove={() => onRemove(item.id)}
               onUpdateCategory={onUpdateCategory}
               onUpdateStore={onUpdateStore}
+              onUpdateAisle={onUpdateAisle}
             />
           ))}
         </div>
@@ -219,6 +224,7 @@ ShoppingList.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onUpdateCategory: PropTypes.func.isRequired,
   onUpdateStore: PropTypes.func.isRequired,
+  onUpdateAisle: PropTypes.func.isRequired,
   onClearChecked: PropTypes.func.isRequired,
 };
 

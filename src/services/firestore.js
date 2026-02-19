@@ -46,6 +46,11 @@ export const createList = async (userId, name) => {
   return ref.id;
 };
 
+/** Updates fields on a shopping list (e.g. rename). */
+export const updateList = async (userId, listId, updates) => {
+  await updateDoc(listDoc(userId, listId), updates);
+};
+
 /** Deletes a shopping list and all its items (subcollection). */
 export const deleteList = async (userId, listId) => {
   // Firestore doesn't cascade-delete subcollections, so we batch-delete items first

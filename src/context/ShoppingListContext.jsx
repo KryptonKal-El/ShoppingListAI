@@ -13,6 +13,7 @@ import {
   subscribeCustomCategories,
   subscribeStores,
   createList as fsCreateList,
+  updateList as fsUpdateList,
   deleteList as fsDeleteList,
   addItem as fsAddItem,
   addItems as fsAddItems,
@@ -128,11 +129,16 @@ export const ShoppingListProvider = ({ children }) => {
     }
   }, [userId, activeListId, lists]);
 
+  const renameListAction = useCallback(async (id, newName) => {
+    if (!userId) return;
+    await fsUpdateList(userId, id, { name: newName });
+  }, [userId]);
+
   const selectListAction = useCallback((id) => {
     setActiveListId(id);
   }, []);
 
-  const addItemAction = useCallback(async (listId, rawName, storeId = null) => {
+  const addItemAction = useCallback(async (listId, rawName, storeId = null, aisle = null) => {
     if (!userId) return;
     const name = capitalize(rawName.trim());
     const item = {
@@ -140,6 +146,7 @@ export const ShoppingListProvider = ({ children }) => {
       category: categorizeItem(name, customCategories),
       isChecked: false,
       store: storeId,
+      aisle,
     };
     await fsAddItem(userId, listId, item);
     await addHistoryEntry(userId, name);
@@ -154,6 +161,7 @@ export const ShoppingListProvider = ({ children }) => {
         category: item.category ?? categorizeItem(name, customCategories),
         isChecked: false,
         store: item.store ?? null,
+        aisle: item.aisle ?? null,
       };
     });
     await fsAddItems(userId, listId, prepared);
@@ -219,6 +227,7 @@ export const ShoppingListProvider = ({ children }) => {
     await fsCreateStore(userId, {
       name,
       color,
+      aisles: [],
       order: stores.length,
     });
   }, [userId, stores.length]);
@@ -253,6 +262,7 @@ export const ShoppingListProvider = ({ children }) => {
 
   const actions = {
     createList: createListAction,
+    renameList: renameListAction,
     deleteList: deleteListAction,
     selectList: selectListAction,
     addItem: addItemAction,

@@ -5,14 +5,16 @@ import styles from './ShoppingItem.module.css';
 
 /**
  * A single shopping list item row with checkbox, name, clickable category badge,
- * clickable store badge, and delete button.
- * Clicking either badge opens a dropdown to reassign.
+ * clickable store badge, clickable aisle badge, and delete button.
+ * Clicking any badge opens a dropdown to reassign.
  */
-export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemove, onUpdateCategory, onUpdateStore }) => {
+export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateAisle }) => {
   const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false);
   const [isStorePickerOpen, setIsStorePickerOpen] = useState(false);
+  const [isAislePickerOpen, setIsAislePickerOpen] = useState(false);
   const categoryPickerRef = useRef(null);
   const storePickerRef = useRef(null);
+  const aislePickerRef = useRef(null);
 
   const allLabels = getAllCategoryLabels(customCategories);
   const allColors = getAllCategoryColors(customCategories);
@@ -23,6 +25,7 @@ export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemov
     storeMap[s.id] = s;
   }
   const assignedStore = item.store ? storeMap[item.store] : null;
+  const storeAisles = assignedStore?.aisles ?? [];
 
   // Close category picker on outside click
   useEffect(() => {
@@ -48,6 +51,18 @@ export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemov
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isStorePickerOpen]);
 
+  // Close aisle picker on outside click
+  useEffect(() => {
+    if (!isAislePickerOpen) return;
+    const handleClick = (e) => {
+      if (aislePickerRef.current && !aislePickerRef.current.contains(e.target)) {
+        setIsAislePickerOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isAislePickerOpen]);
+
   const handleSelectCategory = (key) => {
     if (key !== item.category) {
       onUpdateCategory(item.id, key);
@@ -58,8 +73,19 @@ export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemov
   const handleSelectStore = (storeId) => {
     if (storeId !== (item.store ?? null)) {
       onUpdateStore(item.id, storeId);
+      // Clear aisle when store changes
+      if (item.aisle) {
+        onUpdateAisle(item.id, null);
+      }
     }
     setIsStorePickerOpen(false);
+  };
+
+  const handleSelectAisle = (aisleName) => {
+    if (aisleName !== (item.aisle ?? null)) {
+      onUpdateAisle(item.id, aisleName);
+    }
+    setIsAislePickerOpen(false);
   };
 
   return (
@@ -107,6 +133,41 @@ export const ShoppingItem = ({ item, customCategories, stores, onToggle, onRemov
                       style={{ backgroundColor: store.color }}
                     />
                     {store.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {assignedStore && storeAisles.length > 0 && (
+          <div className={styles.aisleWrapper} ref={aislePickerRef}>
+            <button
+              type="button"
+              className={styles.aisleBadge}
+              onClick={() => setIsAislePickerOpen(!isAislePickerOpen)}
+              title="Change aisle"
+            >
+              {item.aisle ?? 'No aisle'}
+            </button>
+            {isAislePickerOpen && (
+              <div className={styles.picker}>
+                <button
+                  type="button"
+                  className={`${styles.pickerOption} ${!item.aisle ? styles.pickerActive : ''}`}
+                  onClick={() => handleSelectAisle(null)}
+                >
+                  <span className={styles.pickerDot} style={{ backgroundColor: '#bbb' }} />
+                  No aisle
+                </button>
+                {storeAisles.map((aisle) => (
+                  <button
+                    key={aisle}
+                    type="button"
+                    className={`${styles.pickerOption} ${aisle === item.aisle ? styles.pickerActive : ''}`}
+                    onClick={() => handleSelectAisle(aisle)}
+                  >
+                    <span className={styles.pickerDot} style={{ backgroundColor: '#78909c' }} />
+                    {aisle}
                   </button>
                 ))}
               </div>
@@ -161,6 +222,7 @@ ShoppingItem.propTypes = {
     category: PropTypes.string.isRequired,
     isChecked: PropTypes.bool.isRequired,
     store: PropTypes.string,
+    aisle: PropTypes.string,
   }).isRequired,
   customCategories: PropTypes.array,
   stores: PropTypes.array,
@@ -168,6 +230,7 @@ ShoppingItem.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onUpdateCategory: PropTypes.func.isRequired,
   onUpdateStore: PropTypes.func.isRequired,
+  onUpdateAisle: PropTypes.func.isRequired,
 };
 
 ShoppingItem.defaultProps = {
