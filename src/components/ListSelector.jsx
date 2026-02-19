@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { ConfirmDialog } from './ConfirmDialog.jsx';
 import styles from './ListSelector.module.css';
 
 /**
@@ -9,6 +10,7 @@ import styles from './ListSelector.module.css';
 export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete }) => {
   const [newName, setNewName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -65,11 +67,21 @@ export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete
             </button>
             <button
               className={styles.deleteBtn}
-              onClick={() => onDelete(list.id)}
+              onClick={() => setConfirmingDeleteId(list.id)}
               aria-label={`Delete ${list.name}`}
             >
               x
             </button>
+            {confirmingDeleteId === list.id && (
+              <ConfirmDialog
+                message={`Delete "${list.name}" and all its items?`}
+                onConfirm={() => {
+                  onDelete(list.id);
+                  setConfirmingDeleteId(null);
+                }}
+                onCancel={() => setConfirmingDeleteId(null)}
+              />
+            )}
           </div>
         ))}
       </div>

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { CATEGORIES, getAllCategoryLabels, getAllCategoryColors, getAllCategoryKeys } from '../utils/categories.js';
+import { ConfirmDialog } from './ConfirmDialog.jsx';
 import { ShoppingItem } from './ShoppingItem.jsx';
 import styles from './ShoppingList.module.css';
 
@@ -78,6 +80,8 @@ export const ShoppingList = ({
   onUpdateStore,
   onClearChecked,
 }) => {
+  const [isConfirmingClear, setIsConfirmingClear] = useState(false);
+
   if (items.length === 0) {
     return (
       <div className={styles.empty}>
@@ -174,9 +178,20 @@ export const ShoppingList = ({
             <h3 className={styles.groupTitle}>
               Checked ({checkedItems.length})
             </h3>
-            <button className={styles.clearBtn} onClick={onClearChecked}>
+            <button className={styles.clearBtn} onClick={() => setIsConfirmingClear(true)}>
               Clear checked
             </button>
+            {isConfirmingClear && (
+              <ConfirmDialog
+                message={`Clear all ${checkedItems.length} checked items?`}
+                confirmLabel="Clear"
+                onConfirm={() => {
+                  onClearChecked();
+                  setIsConfirmingClear(false);
+                }}
+                onCancel={() => setIsConfirmingClear(false)}
+              />
+            )}
           </div>
           {checkedItems.map((item) => (
             <ShoppingItem

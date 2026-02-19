@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_COLORS } from '../utils/categories.js';
+import { ConfirmDialog } from './ConfirmDialog.jsx';
 import styles from './CategoryManager.module.css';
 
 const PRESET_COLORS = [
@@ -30,6 +31,7 @@ export const CategoryManager = ({
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
   const [editKeywords, setEditKeywords] = useState('');
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -215,12 +217,22 @@ export const CategoryManager = ({
                         <button
                           type="button"
                           className={`${styles.iconBtn} ${styles.deleteIcon}`}
-                          onClick={() => onDelete(cat.id)}
+                          onClick={() => setConfirmingDeleteId(cat.id)}
                           aria-label={`Delete ${cat.name}`}
                           title="Delete"
                         >
                           ×
                         </button>
+                        {confirmingDeleteId === cat.id && (
+                          <ConfirmDialog
+                            message={`Delete category "${cat.name}"?`}
+                            onConfirm={() => {
+                              onDelete(cat.id);
+                              setConfirmingDeleteId(null);
+                            }}
+                            onCancel={() => setConfirmingDeleteId(null)}
+                          />
+                        )}
                       </div>
                     </div>
                   )}

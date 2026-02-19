@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { ConfirmDialog } from './ConfirmDialog.jsx';
 import styles from './StoreManager.module.css';
 
 const PRESET_COLORS = [
@@ -25,6 +26,7 @@ export const StoreManager = ({
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -172,12 +174,22 @@ export const StoreManager = ({
                         <button
                           type="button"
                           className={`${styles.iconBtn} ${styles.deleteIcon}`}
-                          onClick={() => onDelete(store.id)}
+                          onClick={() => setConfirmingDeleteId(store.id)}
                           aria-label={`Delete ${store.name}`}
                           title="Delete"
                         >
                           ×
                         </button>
+                        {confirmingDeleteId === store.id && (
+                          <ConfirmDialog
+                            message={`Delete store "${store.name}"?`}
+                            onConfirm={() => {
+                              onDelete(store.id);
+                              setConfirmingDeleteId(null);
+                            }}
+                            onCancel={() => setConfirmingDeleteId(null)}
+                          />
+                        )}
                       </div>
                     </div>
                   )}
