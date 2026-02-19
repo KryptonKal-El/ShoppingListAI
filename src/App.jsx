@@ -49,6 +49,11 @@ export const App = () => {
     actions.clearChecked(activeList.id);
   };
 
+  const handleUpdateCategory = (itemId, newCategory) => {
+    if (!activeList) return;
+    actions.updateItem(activeList.id, itemId, { category: newCategory });
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loading}>
@@ -96,6 +101,7 @@ export const App = () => {
                 customCategories={state.customCategories}
                 onToggle={handleToggleItem}
                 onRemove={handleRemoveItem}
+                onUpdateCategory={handleUpdateCategory}
                 onClearChecked={handleClearChecked}
               />
               <Suggestions suggestions={suggestions} onAdd={handleAddItem} />

@@ -40,15 +40,80 @@
   transition: color 0.2s;
 }
 
+.categoryWrapper {
+  position: relative;
+}
+
 .category {
   font-size: 0.7rem;
+  font-family: inherit;
   color: white;
   padding: 0.2rem 0.5rem;
   border-radius: 12px;
+  border: none;
   white-space: nowrap;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.category:hover {
+  opacity: 0.85;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+.picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 0.35rem 0;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.pickerOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: #333;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.pickerOption:hover {
+  background: #f5f5f5;
+}
+
+.pickerActive {
+  background: #e8f5e9;
+  font-weight: 600;
+}
+
+.pickerActive:hover {
+  background: #c8e6c9;
+}
+
+.pickerDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .deleteBtn {

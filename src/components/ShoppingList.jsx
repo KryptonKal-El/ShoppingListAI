@@ -8,7 +8,7 @@ import styles from './ShoppingList.module.css';
  * Unchecked items appear first, checked items at the bottom.
  * Supports both built-in and custom categories.
  */
-export const ShoppingList = ({ items, customCategories, onToggle, onRemove, onClearChecked }) => {
+export const ShoppingList = ({ items, customCategories, onToggle, onRemove, onUpdateCategory, onClearChecked }) => {
   if (items.length === 0) {
     return (
       <div className={styles.empty}>
@@ -56,6 +56,7 @@ export const ShoppingList = ({ items, customCategories, onToggle, onRemove, onCl
                 customCategories={customCategories}
                 onToggle={() => onToggle(item.id)}
                 onRemove={() => onRemove(item.id)}
+                onUpdateCategory={onUpdateCategory}
               />
             ))}
           </div>
@@ -79,6 +80,7 @@ export const ShoppingList = ({ items, customCategories, onToggle, onRemove, onCl
               customCategories={customCategories}
               onToggle={() => onToggle(item.id)}
               onRemove={() => onRemove(item.id)}
+              onUpdateCategory={onUpdateCategory}
             />
           ))}
         </div>
@@ -92,6 +94,7 @@ ShoppingList.propTypes = {
   customCategories: PropTypes.array,
   onToggle: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
+  onUpdateCategory: PropTypes.func.isRequired,
   onClearChecked: PropTypes.func.isRequired,
 };
 

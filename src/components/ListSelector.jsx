@@ -61,7 +61,7 @@ export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onDelete
               onClick={() => onSelect(list.id)}
             >
               <span className={styles.listName}>{list.name}</span>
-              <span className={styles.listCount}>{list.items.length} items</span>
+              <span className={styles.listCount}>{list.items?.length ?? 0} items</span>
             </button>
             <button
               className={styles.deleteBtn}
