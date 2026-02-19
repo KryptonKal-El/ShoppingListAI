@@ -118,7 +118,6 @@ export const updateItem = async (userId, listId, itemId, updates) => {
 /** Deletes a single item. */
 export const removeItem = async (userId, listId, itemId) => {
   await deleteDoc(itemDoc(userId, listId, itemId));
-  await updateDoc(listDoc(userId, listId), { itemCount: increment(-1) });
 };
 
 /** Deletes all checked items from a list in a batch. */
@@ -127,7 +126,6 @@ export const clearCheckedItems = async (userId, listId, checkedItemIds) => {
   for (const id of checkedItemIds) {
     batch.delete(itemDoc(userId, listId, id));
   }
-  batch.update(listDoc(userId, listId), { itemCount: increment(-checkedItemIds.length) });
   await batch.commit();
 };
 

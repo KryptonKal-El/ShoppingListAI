@@ -4,6 +4,7 @@
  * All data is scoped to the authenticated user.
  */
 import { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import { increment } from 'firebase/firestore';
 import { categorizeItem } from '../utils/categories.js';
 import { useAuth } from './AuthContext.jsx';
 import {
@@ -174,13 +175,21 @@ export const ShoppingListProvider = ({ children }) => {
     if (!userId) return;
     const item = activeItems.find((i) => i.id === itemId);
     if (!item) return;
-    await fsUpdateItem(userId, listId, itemId, { isChecked: !item.isChecked });
+    const nowChecked = !item.isChecked;
+    await fsUpdateItem(userId, listId, itemId, { isChecked: nowChecked });
+    // Checked items don't count, so adjust itemCount accordingly
+    await fsUpdateList(userId, listId, { itemCount: increment(nowChecked ? -1 : 1) });
   }, [userId, activeItems]);
 
   const removeItemAction = useCallback(async (listId, itemId) => {
     if (!userId) return;
+    const item = activeItems.find((i) => i.id === itemId);
     await fsRemoveItem(userId, listId, itemId);
-  }, [userId]);
+    // Only decrement if the item was unchecked (checked items aren't in the count)
+    if (item && !item.isChecked) {
+      await fsUpdateList(userId, listId, { itemCount: increment(-1) });
+    }
+  }, [userId, activeItems]);
 
   const updateItemAction = useCallback(async (listId, itemId, updates) => {
     if (!userId) return;
