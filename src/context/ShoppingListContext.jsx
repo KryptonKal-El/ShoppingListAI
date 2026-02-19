@@ -11,6 +11,7 @@ import {
   subscribeItems,
   subscribeHistory,
   subscribeCustomCategories,
+  subscribeStores,
   createList as fsCreateList,
   deleteList as fsDeleteList,
   addItem as fsAddItem,
@@ -23,6 +24,10 @@ import {
   updateCustomCategory as fsUpdateCustomCategory,
   deleteCustomCategory as fsDeleteCustomCategory,
   saveCustomCategoryOrder,
+  createStore as fsCreateStore,
+  updateStore as fsUpdateStore,
+  deleteStore as fsDeleteStore,
+  saveStoreOrder,
 } from '../services/firestore.js';
 
 /** Capitalizes the first letter of a string. */
@@ -43,6 +48,7 @@ export const ShoppingListProvider = ({ children }) => {
   const [activeItems, setActiveItems] = useState([]);
   const [history, setHistory] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
+  const [stores, setStores] = useState([]);
 
   // Track whether we've auto-selected a list on initial load
   const hasAutoSelected = useRef(false);
@@ -92,6 +98,15 @@ export const ShoppingListProvider = ({ children }) => {
     return subscribeCustomCategories(userId, setCustomCategories);
   }, [userId]);
 
+  // Subscribe to stores
+  useEffect(() => {
+    if (!userId) {
+      setStores([]);
+      return;
+    }
+    return subscribeStores(userId, setStores);
+  }, [userId]);
+
   // -----------------------------------------------------------------------
   // Actions (same API surface as before)
   // -----------------------------------------------------------------------
@@ -117,13 +132,14 @@ export const ShoppingListProvider = ({ children }) => {
     setActiveListId(id);
   }, []);
 
-  const addItemAction = useCallback(async (listId, rawName) => {
+  const addItemAction = useCallback(async (listId, rawName, storeId = null) => {
     if (!userId) return;
     const name = capitalize(rawName.trim());
     const item = {
       name,
       category: categorizeItem(name, customCategories),
       isChecked: false,
+      store: storeId,
     };
     await fsAddItem(userId, listId, item);
     await addHistoryEntry(userId, name);
@@ -137,6 +153,7 @@ export const ShoppingListProvider = ({ children }) => {
         name,
         category: item.category ?? categorizeItem(name, customCategories),
         isChecked: false,
+        store: item.store ?? null,
       };
     });
     await fsAddItems(userId, listId, prepared);
@@ -197,6 +214,31 @@ export const ShoppingListProvider = ({ children }) => {
     await saveCustomCategoryOrder(userId, categories);
   }, [userId]);
 
+  const addStoreAction = useCallback(async (name, color) => {
+    if (!userId) return;
+    await fsCreateStore(userId, {
+      name,
+      color,
+      order: stores.length,
+    });
+  }, [userId, stores.length]);
+
+  const updateStoreAction = useCallback(async (id, updates) => {
+    if (!userId) return;
+    await fsUpdateStore(userId, id, updates);
+  }, [userId]);
+
+  const deleteStoreAction = useCallback(async (id) => {
+    if (!userId) return;
+    await fsDeleteStore(userId, id);
+  }, [userId]);
+
+  const reorderStoresAction = useCallback(async (reorderedStores) => {
+    if (!userId) return;
+    setStores(reorderedStores); // optimistic update
+    await saveStoreOrder(userId, reorderedStores);
+  }, [userId]);
+
   // -----------------------------------------------------------------------
   // Build the context value matching the old API shape
   // -----------------------------------------------------------------------
@@ -206,6 +248,7 @@ export const ShoppingListProvider = ({ children }) => {
     activeListId,
     history,
     customCategories,
+    stores,
   };
 
   const actions = {
@@ -222,6 +265,10 @@ export const ShoppingListProvider = ({ children }) => {
     updateCustomCategory: updateCustomCategoryAction,
     deleteCustomCategory: deleteCustomCategoryAction,
     reorderCustomCategories: reorderCustomCategoriesAction,
+    addStore: addStoreAction,
+    updateStore: updateStoreAction,
+    deleteStore: deleteStoreAction,
+    reorderStores: reorderStoresAction,
   };
 
   // Build activeList object matching old shape (list + its items)

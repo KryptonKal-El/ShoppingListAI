@@ -40,6 +40,35 @@
   transition: color 0.2s;
 }
 
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.storeWrapper {
+  position: relative;
+}
+
+.storeBadge {
+  font-size: 0.65rem;
+  font-family: inherit;
+  color: white;
+  padding: 0.15rem 0.45rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+  background: #bbb;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.storeBadge:hover {
+  opacity: 0.85;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
 .categoryWrapper {
   position: relative;
 }

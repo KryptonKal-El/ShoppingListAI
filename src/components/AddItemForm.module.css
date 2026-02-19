@@ -38,3 +38,21 @@
   background: #c8e6c9;
   cursor: not-allowed;
 }
+
+.storeSelect {
+  padding: 0.75rem 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: white;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-width: 120px;
+}
+
+.storeSelect:focus {
+  outline: none;
+  border-color: #1565c0;
+}

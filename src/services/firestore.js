@@ -28,6 +28,8 @@ const listDoc = (userId, listId) => doc(db, 'users', userId, 'lists', listId);
 const itemsCol = (userId, listId) => collection(db, 'users', userId, 'lists', listId, 'items');
 const itemDoc = (userId, listId, itemId) => doc(db, 'users', userId, 'lists', listId, 'items', itemId);
 const historyCol = (userId) => collection(db, 'users', userId, 'history');
+const storesCol = (userId) => collection(db, 'users', userId, 'stores');
+const storeDoc = (userId, storeId) => doc(db, 'users', userId, 'stores', storeId);
 const categoriesCol = (userId) => collection(db, 'users', userId, 'customCategories');
 const categoryDoc = (userId, catId) => doc(db, 'users', userId, 'customCategories', catId);
 
@@ -204,5 +206,52 @@ export const subscribeCustomCategories = (userId, callback) => {
       ...d.data(),
     }));
     callback(categories);
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Stores
+// ---------------------------------------------------------------------------
+
+/** Creates a new store. Returns the generated ID. */
+export const createStore = async (userId, store) => {
+  const ref = await addDoc(storesCol(userId), {
+    ...store,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+};
+
+/** Updates a store. */
+export const updateStore = async (userId, storeId, updates) => {
+  await updateDoc(storeDoc(userId, storeId), updates);
+};
+
+/** Deletes a store. */
+export const deleteStore = async (userId, storeId) => {
+  await deleteDoc(storeDoc(userId, storeId));
+};
+
+/** Saves the full ordered array of stores (for reordering). */
+export const saveStoreOrder = async (userId, stores) => {
+  const batch = writeBatch(db);
+  stores.forEach((s, index) => {
+    batch.update(storeDoc(userId, s.id), { order: index });
+  });
+  await batch.commit();
+};
+
+/**
+ * Subscribes to stores in real-time.
+ * @returns {Function} Unsubscribe function
+ */
+export const subscribeStores = (userId, callback) => {
+  const q = query(storesCol(userId), orderBy('order', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const stores = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    callback(stores);
   });
 };
