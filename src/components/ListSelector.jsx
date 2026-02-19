@@ -100,7 +100,7 @@ export const ListSelector = ({ lists, activeListId, onSelect, onCreate, onRename
                   onDoubleClick={() => handleStartEdit(list)}
                 >
                   <span className={styles.listName}>{list.name}</span>
-                  <span className={styles.listCount}>{list.items?.length ?? 0} items</span>
+                  <span className={styles.listCount}>{list.itemCount ?? 0} items</span>
                 </button>
                 <button
                   className={styles.editBtn}

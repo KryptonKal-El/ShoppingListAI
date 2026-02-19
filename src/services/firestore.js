@@ -15,6 +15,7 @@ import {
   orderBy,
   serverTimestamp,
   writeBatch,
+  increment,
 } from 'firebase/firestore';
 import { db } from './firebase.js';
 
@@ -41,6 +42,7 @@ const categoryDoc = (userId, catId) => doc(db, 'users', userId, 'customCategorie
 export const createList = async (userId, name) => {
   const ref = await addDoc(listsCol(userId), {
     name,
+    itemCount: 0,
     createdAt: serverTimestamp(),
   });
   return ref.id;
@@ -93,6 +95,7 @@ export const addItem = async (userId, listId, item) => {
     ...item,
     addedAt: serverTimestamp(),
   });
+  await updateDoc(listDoc(userId, listId), { itemCount: increment(1) });
   return ref.id;
 };
 
@@ -103,6 +106,7 @@ export const addItems = async (userId, listId, items) => {
     const ref = doc(itemsCol(userId, listId));
     batch.set(ref, { ...item, addedAt: serverTimestamp() });
   }
+  batch.update(listDoc(userId, listId), { itemCount: increment(items.length) });
   await batch.commit();
 };
 
@@ -114,6 +118,7 @@ export const updateItem = async (userId, listId, itemId, updates) => {
 /** Deletes a single item. */
 export const removeItem = async (userId, listId, itemId) => {
   await deleteDoc(itemDoc(userId, listId, itemId));
+  await updateDoc(listDoc(userId, listId), { itemCount: increment(-1) });
 };
 
 /** Deletes all checked items from a list in a batch. */
@@ -122,6 +127,7 @@ export const clearCheckedItems = async (userId, listId, checkedItemIds) => {
   for (const id of checkedItemIds) {
     batch.delete(itemDoc(userId, listId, id));
   }
+  batch.update(listDoc(userId, listId), { itemCount: increment(-checkedItemIds.length) });
   await batch.commit();
 };
 
