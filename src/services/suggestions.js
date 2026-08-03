@@ -66,33 +66,33 @@ const getPairingSuggestions = (currentItems) => {
 };
 
 /**
- * Builds a map of item name (lowercased) to its most recent image URL.
- * History is ordered oldest-first, so later entries overwrite earlier ones,
- * leaving the latest known image per name.
- * @param {Array<{name: string, imageUrl?: string|null}>} history - Past items
- * @returns {Map<string, string>} Lowercased name -> image URL
+ * Builds a map of item name (lowercased) to the most recent history record,
+ * i.e. its mirrored template fields (category, image, store, quantity, price,
+ * unit, note). History is ordered oldest-first, so later entries win.
+ * @param {Array<object>} history - Past items with mirrored fields
+ * @returns {Map<string, object>} Lowercased name -> latest template
  */
-const getLatestImages = (history) => {
-  const images = new Map();
+const getLatestTemplates = (history) => {
+  const templates = new Map();
   for (const item of history) {
-    if (item.imageUrl) {
-      images.set(item.name.toLowerCase(), item.imageUrl);
-    }
+    templates.set(item.name.toLowerCase(), item);
   }
-  return images;
+  return templates;
 };
 
 /**
- * Generates AI-powered suggestions based on history and current list.
- * @param {Array<{name: string, addedAt: string, imageUrl?: string|null}>} history - Past shopping items
+ * Generates AI-powered suggestions based on history and current list. Each
+ * suggestion carries the item's full reusable template so a pick restores its
+ * latest saved fields.
+ * @param {Array<object>} history - Past shopping items (with mirrored fields)
  * @param {Array<{name: string}>} currentItems - Items currently in the list
  * @param {number} [maxSuggestions=8] - Maximum number of suggestions to return
  * @param {string} [listType] - The list type for auto-categorization (e.g., 'grocery', 'packing')
- * @returns {Array<{name: string, reason: string, category: string, imageUrl: string|null}>} Suggested items
+ * @returns {Array<{name: string, reason: string, category: string, imageUrl: string|null, storeId: string|null, quantity: number|null, price: number|null, unit: string|null, note: string|null}>} Suggested items
  */
 export const getSuggestions = (history, currentItems, maxSuggestions = 8, listType) => {
   const currentNames = new Set(currentItems.map((i) => i.name.toLowerCase()));
-  const images = getLatestImages(history);
+  const templates = getLatestTemplates(history);
   const suggestions = [];
   const seen = new Set();
 
@@ -102,11 +102,17 @@ export const getSuggestions = (history, currentItems, maxSuggestions = 8, listTy
       return;
     }
     seen.add(key);
+    const t = templates.get(key);
     suggestions.push({
       name,
       reason,
-      category: categorizeItem(name, undefined, listType),
-      imageUrl: images.get(key) ?? null,
+      category: t?.category ?? categorizeItem(name, undefined, listType),
+      imageUrl: t?.imageUrl ?? null,
+      storeId: t?.storeId ?? null,
+      quantity: t?.quantity ?? null,
+      price: t?.price ?? null,
+      unit: t?.unit ?? null,
+      note: t?.note ?? null,
     });
   };
 

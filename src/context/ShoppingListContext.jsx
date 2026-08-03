@@ -28,7 +28,6 @@ import {
   resetGuestListRsvp,
   addHistoryEntry,
   addHistoryEntries,
-  setHistoryImageForItem,
   createStore as dbCreateStore,
   updateStore as dbUpdateStore,
   deleteStore as dbDeleteStore,
@@ -596,25 +595,36 @@ export const ShoppingListProvider = ({ children }) => {
     setActiveListId(id);
   }, []);
 
-  const addItemAction = useCallback(async (listId, rawName, storeId = null, imageUrl = null) => {
+  const addItemAction = useCallback(async (listId, rawName, storeId = null, template = null) => {
     if (!userId) return;
     const ownerUid = getListOwnerUid(listId);
     const name = capitalize(rawName.trim());
     const listEntry = allLists.find((l) => l.id === listId);
     const listType = listEntry?.type ?? 'grocery';
     const categories = getEffectiveCategories(listEntry, userCategoryDefaults);
-    const category = categories ? categorizeItem(name, categories, listType) : null;
+    // When reusing a suggestion, restore its saved fields; otherwise derive defaults.
+    const category = template?.category ?? (categories ? categorizeItem(name, categories, listType) : null);
     const item = {
       name,
       category,
       isChecked: false,
-      store: storeId,
-      quantity: 1,
-      price: null,
-      imageUrl,
+      store: storeId ?? template?.storeId ?? null,
+      quantity: template?.quantity ?? 1,
+      price: template?.price ?? null,
+      imageUrl: template?.imageUrl ?? null,
+      unit: template?.unit ?? 'each',
+      note: template?.note ?? null,
     };
     await dbAddItem(ownerUid, listId, item);
-    await addHistoryEntry(userId, listId, name, imageUrl);
+    await addHistoryEntry(userId, listId, name, {
+      imageUrl: item.imageUrl,
+      category: item.category,
+      storeId: item.store,
+      quantity: item.quantity,
+      price: item.price,
+      unit: item.unit,
+      note: item.note,
+    });
   }, [userId, allLists, userCategoryDefaults, getListOwnerUid]);
 
   const addItemsAction = useCallback(async (listId, items) => {
@@ -638,8 +648,16 @@ export const ShoppingListProvider = ({ children }) => {
       };
     });
     await dbAddItems(ownerUid, listId, prepared);
-    const itemNames = prepared.map((item) => item.name);
-    await addHistoryEntries(userId, listId, itemNames);
+    await addHistoryEntries(userId, listId, prepared.map((item) => ({
+      name: item.name,
+      imageUrl: item.imageUrl,
+      category: item.category,
+      storeId: item.store,
+      quantity: item.quantity,
+      price: item.price,
+      unit: item.unit,
+      note: item.note ?? null,
+    })));
   }, [userId, allLists, userCategoryDefaults, getListOwnerUid]);
 
   const toggleItemAction = useCallback(async (listId, itemId, explicitChecked = null) => {
@@ -669,15 +687,9 @@ export const ShoppingListProvider = ({ children }) => {
     if (!userId) return;
     const ownerUid = getListOwnerUid(listId);
     await dbUpdateItem(ownerUid, listId, itemId, updates);
-    // Keep the item's suggestion history image in sync so it carries over when
-    // the item is later re-added from suggestions.
-    if (updates.imageUrl !== undefined) {
-      const item = activeItems.find((i) => i.id === itemId);
-      if (item?.name) {
-        await setHistoryImageForItem(listId, item.name, updates.imageUrl);
-      }
-    }
-  }, [userId, activeItems, getListOwnerUid]);
+    // Item -> history sync (rename, image, and every mirrored field) is handled
+    // by a DB trigger; see 20260803120000_mirror_items_to_history.sql.
+  }, [userId, getListOwnerUid]);
 
   const clearCheckedAction = useCallback(async (listId) => {
     if (!userId) return;

@@ -53,8 +53,10 @@
   cursor: pointer;
   user-select: none;
   position: sticky;
-  top: 0;
+  top: 1rem;
   z-index: 3;
+  /* Promote to its own layer so will-change'd item rows can't composite on top. */
+  transform: translateZ(0);
 }
 
 .topLevelTitleCollapsed {
@@ -87,6 +89,10 @@
 
 .topLevelBody {
   padding: 0.25rem 0;
+  /* Contain item rows in their own stacking context so they can't paint above
+     the sticky category headers (the checked section gets this for free via
+     its opacity rule). */
+  isolation: isolate;
 }
 
 .nestedGroup {
@@ -131,11 +137,12 @@
   padding: 0.4rem 0;
   border-bottom: 1px solid var(--border-subtle);
   margin: 0;
-  /* Pin below the main category header (which stays at top: 0). */
+  /* Pin below the main category header (which stays at top: 1rem). */
   position: sticky;
-  top: var(--cat-header-height);
+  top: calc(1rem + var(--cat-header-height));
   z-index: 2;
   background: var(--bg-card);
+  transform: translateZ(0);
 }
 
 .count {
@@ -175,8 +182,9 @@
   cursor: pointer;
   user-select: none;
   position: sticky;
-  top: 0;
+  top: 1rem;
   z-index: 3;
+  transform: translateZ(0);
 }
 
 .checkedHeaderCollapsed {

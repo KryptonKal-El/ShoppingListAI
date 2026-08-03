@@ -356,3 +356,544 @@ Updated focused integration-style component/context tests because both gaps invo
 ## Conventions Observed
 
 - conventions file for testing is missing, consider proposing a convention for unit-vs-integration choice and mock strategy.
+
+============================================================
+[2026-06-02 11:30:00 local time] — CSS Consistency Fix — react-dev
+============================================================
+
+## What I implemented
+
+Applied CSS consistency fix to `.circleBtn` class across ListSelector and RecipeSelector components, updating them from solid green background (white text) to transparent background with green text to match the recently updated StoreManager component style.
+
+## Files changed
+
+- src/components/ListSelector.module.css — updated `.circleBtn`, `.circleBtn:hover`, `.circleBtnCancel`, `.circleBtnCancel:hover` to match StoreManager pattern (transparent background, color-based styling).
+- src/components/RecipeSelector.module.css — updated `.circleBtn` and `.circleBtn:hover` to match StoreManager pattern (no `.circleBtnCancel` in this file).
+
+## Build / lint results
+
+- npm run lint: pre-existing unrelated errors; CSS files have no new violations.
+
+## Conventions Observed
+
+(none)
+
+============================================================
+[2026-06-02 20:00:00 local time] — Task 1 — swift-dev
+============================================================
+
+## What I implemented
+
+Refactored the list three-dot menu in ListDetailView: renamed "Edit" button to "Edit Name, Icon & Color", added new "Manage Categories" menu item, and reordered all menu items to place category management after stores and before share settings.
+
+## Files changed
+
+- ios-native/GatherLists/GatherLists/Views/Lists/ListDetailView.swift — added @State private var showManageCategoriesSheet; renamed Edit button label; reordered menu items (Edit, Manage Stores, Manage Categories, Share Settings, Duplicate, Reset items, Divider, Delete); added .sheet presenter for CategoryEditorSheet with proper environment binding.
+
+## Build / lint results
+
+- Swift syntax check: pass (no compilation errors)
+- Provisioning profile warnings expected in local dev environment
+
+## Conventions Observed
+
+(none)
+
+============================================================
+[2026-06-03 14:37:20 PDT] — Story US-001 — react-tester
+============================================================
+
+## Test Strategy
+
+Unit tests via Vitest for a static HTML file. Since the marketing page contains no JavaScript and no React components, tests read the HTML file as a string and verify structure, content, semantic elements, and meta tags. One logical assertion per test validates the expected behavior.
+
+## Tests written
+
+- src/__tests__/marketing-page.test.js:file exists and is non-empty — verifies the HTML file loads and has content
+- src/__tests__/marketing-page.test.js:contains Apple iTunes app meta tag with correct app ID — validates iOS app linking
+- src/__tests__/marketing-page.test.js:contains og:title meta tag — verifies Open Graph title present
+- src/__tests__/marketing-page.test.js:contains og:description meta tag — verifies Open Graph description present
+- src/__tests__/marketing-page.test.js:contains og:image meta tag — verifies Open Graph image present
+- src/__tests__/marketing-page.test.js:contains og:url meta tag — verifies Open Graph URL present
+- src/__tests__/marketing-page.test.js:contains description meta tag — validates meta description for SEO
+- src/__tests__/marketing-page.test.js:contains h1 heading tag — verifies main heading present
+- src/__tests__/marketing-page.test.js:contains App Store badge link to correct app — validates download link
+- src/__tests__/marketing-page.test.js:contains Smart Lists feature card label — verifies first feature visible
+- src/__tests__/marketing-page.test.js:contains Real-Time Sharing feature card label — verifies second feature visible
+- src/__tests__/marketing-page.test.js:contains Recipes & Meal Planning feature card label — verifies third feature visible
+- src/__tests__/marketing-page.test.js:contains Works Everywhere feature card label — verifies fourth feature visible
+- src/__tests__/marketing-page.test.js:contains support footer link — validates footer navigation
+- src/__tests__/marketing-page.test.js:contains privacy policy footer link — validates privacy link present
+- src/__tests__/marketing-page.test.js:contains app footer link — validates app link present
+- src/__tests__/marketing-page.test.js:contains copyright notice for 2026 — verifies copyright year correct
+- src/__tests__/marketing-page.test.js:does not contain script tags — confirms no JavaScript on marketing page
+- src/__tests__/marketing-page.test.js:contains header semantic element — verifies proper semantic structure
+- src/__tests__/marketing-page.test.js:contains main semantic element — verifies proper semantic structure
+- src/__tests__/marketing-page.test.js:contains footer semantic element — verifies proper semantic structure
+- src/__tests__/marketing-page.test.js:contains correct brand color #3D7A63 in stylesheet — validates brand consistency
+
+## npm test
+
+- pass — 22 tests passing, all assertions green
+
+## Coverage Gaps Observed
+
+- none
+
+## Conventions Observed
+
+- Vitest describe/it naming follows project style: descriptive behavior names over implementation detail
+- fs.readFileSync and path.resolve used for file access; ESM import.meta.url pattern for path resolution
+- One logical assertion concept per test with multiple expect calls when verifying a single outcome
+- Test file co-located structure respected (new src/__tests__/ directory created for non-component static asset tests)
+
+============================================================
+[2026-06-03 14:52:00 CDT] — Story US-002 — react-dev
+============================================================
+
+## What I implemented
+
+Created a static HTML support/FAQ page at `public/support.html` with CSS-only accordion using `<details>`/`<summary>`, 10 FAQ questions, contact section, and visual style matching `privacy.html` with brand green (#3D7A63).
+
+## Files changed
+
+- public/support.html — static support page with FAQ accordion, contact email, back link to `/`, and responsive design matching privacy.html conventions.
+
+## Build / lint results
+
+- npm run lint: pass (pre-existing lint errors in other files unrelated to new static HTML)
+- npm run build: not run (static HTML file does not impact build)
+
+## Conventions Observed
+
+[none]
+
+============================================================
+[2026-06-03 14:30:00 CDT] — Story (untitled) — react-dev
+============================================================
+
+## What I implemented
+
+Fixed PWA Service Worker hijacking of static HTML files by updating the Workbox config in `vite.config.js` to exclude standalone HTML files from precache and prevent navigation fallback interception.
+
+## Files changed
+
+- vite.config.js — lines 40-41: Updated `globPatterns` and added `navigateFallbackDenylist` in workbox config block
+
+## Build / lint results
+
+- npm run lint: pass (no new errors introduced by changes to vite.config.js)
+- npm run build: pass (PWA mode generates SW correctly with 21 precache entries)
+
+## Exact changes made
+
+**Line 40 (before):**
+```js
+globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+```
+
+**Line 40 (after):**
+```js
+globPatterns: ['**/*.{js,css,svg,png,woff2}', 'index.html'],
+```
+
+**Line 41 (new):**
+```js
+navigateFallbackDenylist: [/^\/support\.html$/, /^\/privacy\.html$/, /^\/index-marketing\.html$/],
+```
+
+## Conventions Observed
+
+None applicable to this config-only change.
+
+============================================================
+[2026-06-03 14:35:00 local time] — Story US-003 — react-dev
+============================================================
+
+## What I implemented
+
+Added explicit `navigateFallback: '/'` to the VitePWA workbox config and updated `navigateFallbackDenylist` regex patterns to support both `.html` and clean URL formats, future-proofing the PWA configuration for US-003's clean URL implementation.
+
+## Files changed
+
+- vite.config.js — Added `navigateFallback: '/'` on line 41; updated three regex patterns on line 42 to include `(\.html)?` for forward compatibility with clean URLs.
+
+## Build / lint results
+
+- npm run lint: pass (no errors in vite.config.js; pre-existing errors unrelated to this change)
+- npm run build: pass (successfully built with PWA manifest and service worker)
+
+## Conventions Observed
+
+-
+
+============================================================
+[2026-06-03 16:00:00 local time] — Story US-003 — react-dev
+============================================================
+
+## What I implemented
+
+Configured Vite and Vercel for multi-tenant routing: React app served at `/app` with marketing site at `/`, Service Worker and assets scoped to `/app/`, and Apple App Site Association updated to support `/app` routes.
+
+## Files changed
+
+- vite.config.js — Added `base: '/app'`; updated PWA manifest `scope` and `start_url` to `/app`; updated workbox `navigateFallback` to `/app`; changed all icon `src` paths to absolute (`/icon-*.png`)
+- vercel.json — Replaced rewrites block with ordered rules (most specific first) including `/app` routing to `/index.html` and root routing to `/index-marketing.html`; updated asset and service worker header paths from `/assets/(.*)` to `/app/assets/(.*)` and `/sw.js` to `/app/sw.js`
+- public/.well-known/apple-app-site-association — Updated `paths` from `["*"]` to `["/app", "/app/*"]`
+
+## Build / lint results
+
+- npm run build: pass (dist/index.html correctly references `/app/assets/...` paths)
+- npm run lint: pre-existing errors in unrelated files (`.tmp/`, `ai-tmp/`, `e2e/`, `src/context/`); no new errors in modified files
+
+## Conventions Observed
+
+-
+
+
+============================================================
+[2026-06-03 15:27:00 local time] — Story Fix-Vercel-Static-File-Routing — react-dev
+============================================================
+
+## What I implemented
+
+Updated Vercel static file routing to serve the marketing homepage at `/` by:
+1. Added `postbuild` script to `package.json` that renames `dist/index.html` to `dist/app.html`
+2. Updated `vercel.json` rewrites to point `/app` and `/app/(.*)` destinations to `/app.html` instead of `/index.html`
+
+This ensures Vercel's rewrite rules fire before static file checks, allowing the marketing homepage to be served at `/` while the React SPA is served at `/app`.
+
+## Files changed
+
+- package.json — added postbuild script to rename SPA entry point
+- vercel.json — updated rewrites to point to /app.html
+
+## Build / lint results
+
+- npm run build: PASS
+  - dist/index.html does NOT exist ✅
+  - dist/app.html DOES exist ✅
+  - dist/index-marketing.html exists ✅
+- npm run lint: Pre-existing errors unrelated to this change (context files, test files already had lint issues)
+
+## Conventions Observed
+
+- None new.
+
+
+============================================================
+[2026-06-03 15:35:00 PDT] — Story Fix Vite asset path configuration — react-dev
+============================================================
+
+## What I implemented
+
+Removed `base: '/app'` from vite.config.js and updated vercel.json header sources to align asset paths with how Vercel serves the dist/ directory. With this fix, built assets are now correctly referenced as `/assets/...` instead of `/app/assets/...`, resolving 404 errors on Vercel deployment.
+
+## Files changed
+
+- vite.config.js — removed `base: '/app'` line; PWA manifest `scope` and `start_url` remain at `/app` as intended
+- vercel.json — updated header sources from `/app/assets/(.*)` to `/assets/(.*)` and `/app/sw.js` to `/sw.js`
+
+## Build / lint results
+
+- npm run build: pass (built successfully; dist/app.html exists and references `/assets/...` correctly)
+- npm run lint: pre-existing errors in context, test, and e2e files unrelated to this change
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-03 21:03:06 local time] — Story S-01 — web-dev
+============================================================
+
+## What I implemented
+
+Replaced the old hero header with a sticky navigation bar containing the Gather Lists logo, Features anchor link, and Launch App button. Added responsive styling for mobile with hidden nav link, kept the `.hero` CSS class for future S-02 hero section, and added id="features" to the main element for anchor navigation.
+
+## Files changed
+
+- public/index-marketing.html — replaced <header class="hero"> with <header class="site-header"> containing <nav> with logo, Features link, and Launch App button; added CSS for sticky positioning, flexbox layout, brand color button, and mobile responsiveness; added id="features" to main
+- src/__tests__/marketing-page.test.js — removed tests for h1 and App Store badge (will be added in S-02), added 5 new tests for nav element, logo image, Features anchor, Launch App link, and sticky header CSS
+
+## Lint results
+
+- lint: not configured
+
+## Conventions Observed
+
+- None at this time. No conventions file exists for static HTML/CSS projects in this repo.
+
+
+============================================================
+[2026-06-03 22:36:30 local time] — Story S-01 — web-dev
+============================================================
+
+## What I implemented
+
+Re-implemented the marketing page sticky navigation bar with a Novu-style floating pill navigation design featuring frosted glass effects, fixed positioning, responsive mobile layout with separate CTA button, and updated all tests to validate the new design.
+
+## Files changed
+
+- public/index-marketing.html — Replaced sticky header with fixed floating pill nav: restructured header nav to use CSS Grid (logo, pill center, empty right), added .nav-pill container with backdrop-filter blur and glassmorphism effects, updated logo styling to 20px max-height, implemented mobile-responsive design hiding pill on ≤600px with separate .nav-cta-mobile button, added padding-top: 6rem to body to account for fixed positioning.
+- src/__tests__/marketing-page.test.js — Updated S-01 tests: replaced old sticky nav tests with new tests for position: fixed, border-radius: 50vw pill shape, and backdrop-filter: blur(3px) frosted glass effect; all 27 marketing page tests pass.
+
+## Lint results
+
+- npm test: pass (27 marketing page tests + 93 total tests)
+- npm run lint: pre-existing errors in React context files and test fixtures; HTML and test changes introduce no new violations
+
+## Conventions Observed
+
+- HTML/CSS patterns: No relevant conventions file exists (docs/conventions/html-structure.md not defined). Applied vanilla CSS best practices: semantic HTML structure preserved, CSS Grid for flexible layout, media queries for responsive design, CSS custom properties pattern could be worth documenting if the project accumulates more marketing static pages.
+
+============================================================
+[2026-06-04 07:31:03 local time] — Story S-02 — web-dev
+============================================================
+
+## What I implemented
+
+Added a full-bleed hero section to the marketing page with a dark gradient background (#0f0f0f to #1a2e24), responsive two-column layout (text left, image right on desktop; stacked on mobile), hero headline "Every list, in one place." at 48px desktop/32px mobile, subline at 18px light grey, App Store badge linking to the iOS app, and a placeholder SVG screenshot image. Restructured main element to be a plain container with hero section first, followed by features section moved into its own <section> wrapper.
+
+## Files changed
+
+- public/index-marketing.html — Restructured <main> to be a plain container; added <section class="hero"> with .hero-content (headline, subline, App Store badge) and .hero-image (screenshot) for two-column flex layout; moved feature cards into <section class="features" id="features">; updated .hero CSS with dark gradient, full-width styling, min-height calc(100vh - 5rem), responsive flex layout; added mobile breakpoint to stack hero content single-column and adjust headline to 32px; header and footer unchanged; apple-itunes-app meta tag preserved.
+- public/marketing/app-screenshot.png — Created new placeholder SVG file (390x844 px) with grey gradient background, phone bezel outline, notch, and "Screenshot coming soon" text overlay.
+- src/__tests__/marketing-page.test.js — Added 9 new hero section tests: verify <section class="hero"> exists, headline text present, subline with sync copy, screenshot image with correct src/alt, App Store badge link to correct app ID and CDN URL, dark gradient background CSS, 48px headline sizing, and features section id="features".
+
+## Lint results
+
+- npm test: pass (102 total tests: 36 marketing page tests [27 original + 9 new S-02 hero tests])
+- npm run lint: pre-existing errors in React context and test files; no new violations introduced by HTML/CSS changes
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-04 11:30:00 local time] — Story S-03 — web-dev
+============================================================
+
+## What I implemented
+
+Replaced the 2×2 feature card grid with 4 Novu-style alternating rows. Each row contains `.row-text` (with h2 headline and description) and `.row-icon` (emoji) positioned alternately using `flex-direction` and `.row-reverse` classes. Rows 2 and 4 reverse direction. Desktop layout uses 4rem gap and padding, mobile (≤600px) stacks vertically with icon above text using `order: -1`. All headlines are 2rem/32px bold #111 with green (#3D7A63) italic `<em>` emphasis. Descriptions are 1rem/16px #555. Icon font-size 80px desktop. Removed all old `.feature-card` grid and card styles.
+
+## Files changed
+
+- public/index-marketing.html — Replaced old .features grid CSS with new .feature-row, .row-reverse, .row-text, .row-text h2, .row-text h2 em, .row-text p, .row-icon styles; replaced 4 .feature-card elements with 4 .feature-row elements; rows 2 and 4 have .row-reverse class; updated mobile breakpoint for .feature-row stacking and icon ordering.
+- src/__tests__/marketing-page.test.js — Updated 4 existing feature label tests to check for new copy with <em> splits; added 3 new tests for ≥4 .feature-row elements, .row-reverse class presence, and .row-text h2 em #3D7A63 color.
+
+## Lint results
+
+- npm test: pass (39 marketing page tests: 4 updated label tests + 3 new S-03 tests + all prior tests)
+- npm run lint: pre-existing errors in React context and test files; no new violations introduced by HTML/CSS/test changes
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-04 14:06:45 local time] — Story TSK-20260604-140645 — web-dev
+============================================================
+
+## What I implemented
+
+Redesigned the hero section to center an iPhone image with overlay text and CTA, replacing the previous split layout (text left, CSS phone right) with a centered iPhone mockup containing the headline, subline, and App Store badge positioned inside the screen area.
+
+## Files changed
+
+- public/index-marketing.html — Restructured hero HTML: replaced .hero-text and .hero-phone divs with single .hero-phone-stack container; added real iPhone image (.hero-phone-frame) with .hero-phone-content overlay; updated App Store badge from black to white variant and reduced height from 50 to 44; replaced entire inline CSS phone mockup with image-based layout.
+- public/index-marketing.html (CSS) — Updated .hero-content-wrapper to flex-direction: column with centered alignment; removed .hero-text, .hero-phone, .phone-frame, .phone-notch, .phone-screen CSS rules; added .hero-phone-stack, .hero-phone-frame, .hero-phone-content rules with absolute positioning overlay; updated .hero-headline to clamp(1.5rem, 2.8vw, 2rem) for smaller phone-centered text; updated .hero-subline font-size to 14px with max-width 240px; updated mobile media query to use .hero-phone-frame width: min(85vw, 320px) and responsive headline clamp(1.25rem, 5.5vw, 1.75rem).
+
+## Lint results
+
+- npm run lint: not configured for static HTML files (ESLint ignores .html); pre-existing lint errors in React, test, and e2e files unrelated to this change.
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-04 14:31:00 local time] — Story TSK-20260604-140645 — web-dev
+============================================================
+
+## What I implemented
+
+Redesigned the hero section with FacilPay-style scroll animation: replaced static centered phone with 300vh scroll container featuring oversized iPhone that shrinks as user scrolls, cycling through 5 feature slides (hero CTA + 4 feature slides) with fade gradient mask at bottom.
+
+## Files changed
+
+- public/index-marketing.html (HTML) — Replaced entire hero section with new scroll-driven structure: 300vh scroll container, sticky positioning container, 5 slide carousel (slide 0 = hero CTA, slides 1-4 = feature slides with emoji icons), bottom fade gradient, and complete scroll animation script with particle background logic.
+- public/index-marketing.html (CSS) — Removed .hero-content-wrapper, old .hero-phone-stack, .hero-phone-frame (fixed width), .hero-phone-content; added .hero-scroll-height (min-height: 300vh), .hero-sticky (position: sticky, height: 100vh), .hero-section__canvas (new canvas selector), responsive .hero-phone-stack (width: min(72vw, 820px)), .hero-phone-screens (pointer-events: none), .hero-phone-slide + .active state, feature slide styling, .hero-bottom-fade gradient; updated mobile media queries for 400vh scroll height and responsive font sizes via clamp().
+- src/__tests__/marketing-page.test.js — Updated canvas class selector test from .hero-canvas to .hero-section__canvas; updated hero-phone-content test to check for hero-phone-screens + hero-phone-slide structure; added 8 new tests for scroll-driven animation (scroll height, sticky container, 5 slides, feature slides, fade gradient, animation functions).
+
+## Lint results
+
+- npm test: pass (120 tests including 8 new hero animation tests)
+- npm run lint: pass for marketing HTML (no HTML linter configured; pre-existing React/test lint errors unrelated to this change)
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-04 14:40:10 local time] — Story TSK-20260604-140645 — web-dev
+============================================================
+
+## What I implemented
+
+Applied three accessibility and defensive-coding fixes to the marketing page: added aria-hidden="true" to canvas, removed redundant pointer-events: auto from canvas CSS, added :focus-visible keyboard navigation styles, and added null safety guard in scroll animation JavaScript to prevent errors when DOM elements are missing.
+
+## Files changed
+
+- public/index-marketing.html (line 434) — added aria-hidden="true" to canvas element
+- public/index-marketing.html (line 47–52) — removed pointer-events: auto from .hero-section__canvas CSS rule
+- public/index-marketing.html (line 133–139) — added .nav-link:focus-visible, .launch-button:focus-visible, .hero-cta:focus-visible, .footer a:focus-visible styles with outline and outline-offset
+- public/index-marketing.html (line 589–592) — added null safety guard in scroll JS that checks scrollHeight, phoneStack, and slides before animation, logs warning and returns early
+
+## Test results
+
+- npx vitest run src/__tests__/marketing-page.test.js: PASS — all 54 tests passing
+
+## Conventions Observed
+
+- (none proposed)
+
+============================================================
+[2026-06-04 15:30:54 CDT] — Story [marketing-page-updates-4] — web-dev
+============================================================
+
+## What I implemented
+
+Completed 4 design and behavior changes to the marketing page: increased logo sizes (desktop 44→52px, mobile 36→44px), restructured navigation with Support link, implemented Download App button with smooth letter-flip animation and staggered timing, added Sign In link, and enhanced canvas particles with persistent drift and faster mouse repulsion.
+
+## Files changed
+
+- public/index-marketing.html (line 219) — logo max-height desktop: 44px → 52px
+- public/index-marketing.html (line 439) — logo max-height mobile: 36px → 44px
+- public/index-marketing.html (lines 462–478) — replaced nav HTML structure with Support link, letter-animated Download App button, and Sign In link in new nav-right container
+- public/index-marketing.html (lines 248–355) — replaced launch-button hover styles with letter animation CSS (wrapper containers, letter-top/bottom positioning, staggered transition delays 0ms–242ms), added .nav-right and .sign-in-link styles with focus-visible keyboard support
+- public/index-marketing.html (lines 400–443) — updated mobile media query to hide .nav-pill, show .nav-right with .sign-in-link hidden at ≤600px
+- public/index-marketing.html (lines 564–597) — replaced Particle constructor and update method: added driftVx/driftVy for always-on slow movement, separated extra velocity from mouse, increased repulsion force (0.06→0.12), reduced friction (0.98→0.96), added dist>0 null guard
+
+## Lint results
+
+- lint: not configured for static HTML files (ESLint targets .js/.jsx only; HTML validated manually)
+
+## Conventions Observed
+
+- Letter animation with staggered delays is a reusable micro-interaction pattern worth documenting in docs/conventions/css-patterns.md as "Staggered letter-flip hover animation: use letter-wrapper containers with nth-child delays for sequential visual feedback."
+
+
+============================================================
+[2026-06-04 15:40:30 CDT] — Story [fix-download-button-layout] — web-dev
+============================================================
+
+## What I implemented
+
+Fixed Download App button letter spacing and added Apple logo to both desktop and mobile buttons. Wrapped all letter-wrapper spans in a `.btn-text` container so that the flex gap only applies between Apple icon and text group, not between individual letters. Added inline `transition-delay` styles to each letter pair instead of CSS nth-child rules, eliminating spacing issues. Added Apple SVG logo to both `.launch-button` and `.nav-cta-mobile` elements.
+
+## Files changed
+
+- public/index-marketing.html (line 438–440) — updated `.launch-button` HTML: added Apple SVG icon with class `.apple-icon`, wrapped all letter-wrappers in `.btn-text` span, added inline `transition-delay` styles to each letter pair (0ms–242ms at 22ms increments)
+- public/index-marketing.html (line 445) — updated `.nav-cta-mobile` mobile button: added Apple SVG icon before "Download App" text, added aria-label for accessibility
+- public/index-marketing.html (line 282–289) — added new CSS rules: `.launch-button .apple-icon { flex-shrink: 0; display: block; }` and `.launch-button .btn-text { display: inline-flex; align-items: baseline; }`
+- public/index-marketing.html (line 290–341) — removed all 12 nth-child stagger CSS rules (`.launch-button:hover .letter-wrapper:nth-child(N)`) that were causing excessive letter spacing
+
+## Test results
+
+- npm test: PASS — all 121 tests passing (13 test files, 13 passed)
+
+## Conventions Observed
+
+- (none proposed)
+
+
+============================================================
+[2026-06-04 15:45:00 local time] — Story Marketing Canvas Hearts — web-dev
+============================================================
+
+## What I implemented
+
+Replaced the circular canvas particles with tiny heart shapes in the hero section of `public/index-marketing.html`. Updated particle radius, added a `drawHeart` helper function using Bézier curves, and modified the render loop to draw hearts instead of circles. Opacity bumped from 0.55 to 0.65 for visual balance. Lines between particles remain unchanged.
+
+## Files changed
+
+- public/index-marketing.html — increased PARTICLE_RADIUS from 2 to 4, added drawHeart function with JSDoc, replaced ctx.arc with drawHeart call in loop
+
+## Lint results
+
+- npm test: pass (121 tests passing)
+- no lint command configured for this project
+
+## Conventions Observed
+
+-
+
+
+============================================================
+[2026-06-04 15:50:00 local time] — Story Replace App Store Badge with Letter-Animation Button — web-dev
+============================================================
+
+## What I implemented
+
+Replaced the App Store badge image with a styled pill button containing an Apple icon SVG and letter-by-letter animated "Download App" text, applying the same animation patterns as the nav button. Updated CSS to support letter animations on both nav and hero CTA buttons, and updated tests to verify the new button structure.
+
+## Files changed
+
+- public/index-marketing.html (HTML line 466–483) — replaced `<img>` App Store badge with `<a class="hero-cta">` containing Apple icon SVG and `.btn-text` wrapper with animated letter-wrapper spans
+- public/index-marketing.html (CSS line 108–111) — removed `.hero-cta` from slide-0 grouped display rule
+- public/index-marketing.html (CSS line 132–146) — updated `.hero-cta` base rule with inline-flex, align-items, gap, sizing, padding, border-radius, white background, dark text, font styling
+- public/index-marketing.html (CSS line 292–301) — extended `.apple-icon` and `.btn-text` selectors to include `.hero-cta`
+- public/index-marketing.html (CSS line 302–305) — extended hover letter-animation rule to include `.hero-cta:hover`
+- src/__tests__/marketing-page.test.js (line 210–223) — replaced old App Store badge image tests with 2 new tests for hero-cta letter-animation structure and accessibility attributes
+
+## Test results
+
+- npm test: PASS — all 121 tests passing (13 test files)
+
+## Conventions Observed
+
+- Letter animation pattern: `.letter-wrapper` containers with staggered `transition-delay` inline styles for sequential letter-flip hover effects (reusable across buttons and CTAs).
+
+============================================================
+[2026-06-04 15:54:20 local time] — Focus-visible override — web-dev
+============================================================
+
+## What I implemented
+
+Added a `.hero-cta:focus-visible` override rule with dark outline to ensure visible focus on the white hero CTA button. The override preserves the grouped rule while adding a selector-specific rule after it to take precedence.
+
+## Files changed
+
+- public/index-marketing.html — Added `.hero-cta:focus-visible` override rule at lines 156–159 with dark outline (rgba(17, 17, 17, 0.8)) and 2px offset.
+
+## Lint results
+
+- npm test: pass (all 121 tests passing)
+
+## Conventions Observed
+
+- focus-visible: Use selector-specific overrides after grouped focus-visible rules to achieve different outline colors for buttons with different background colors.
+
+
+============================================================
+[2026-06-04 15:58:22 local time] — Replace App Store badge with white pill button — web-dev
+============================================================
+
+## What I implemented
+
+Replaced the App Store badge image in the green CTA section with a white pill button matching the hero slide's design. The new button includes the Apple icon SVG and animated letter-flip text reading "Download App", maintaining the same App Store link and improving visual consistency across the page.
+
+## Files changed
+
+- public/index-marketing.html — Removed old `.app-store-badge` and `.app-store-badge img` CSS rules; added new `.cta-download` spacing override rule (margin-top: 0; margin-bottom: 0); replaced the image-based badge with the new white pill button structure including Apple icon SVG and animated text.
+
+## Lint results
+
+- npm test: pass (all 121 tests passing, no test updates needed)
+
+## Conventions Observed
+
+- Button reuse: The `.hero-cta` class successfully reuses styling across hero and CTA sections; the `.cta-download` override provides context-specific spacing adjustments without disrupting the hero section.
+- Focus accessibility: The `.hero-cta:focus-visible` dark outline rule works correctly on the white button in the green CTA section, providing clear keyboard navigation feedback.

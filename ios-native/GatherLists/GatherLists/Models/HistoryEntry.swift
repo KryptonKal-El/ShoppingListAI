@@ -7,6 +7,13 @@ struct HistoryEntry: Codable, Identifiable {
     let listId: UUID?
     let name: String
     let imageUrl: String?
+    // Mirrored item "template" fields, kept in sync by a DB trigger.
+    let category: String?
+    let storeId: UUID?
+    let quantity: Int?
+    let price: Decimal?
+    let unit: String?
+    let note: String?
     let addedAt: Date
 
     enum CodingKeys: String, CodingKey {
@@ -15,6 +22,12 @@ struct HistoryEntry: Codable, Identifiable {
         case listId = "list_id"
         case name
         case imageUrl = "image_url"
+        case category
+        case storeId = "store_id"
+        case quantity
+        case price
+        case unit
+        case note
         case addedAt = "added_at"
     }
 }

@@ -1,0 +1,14 @@
+{
+  "sessionId": "builder-1780524536-595479",
+  "sessionDir": "docs/sessions/builder-1780524536-595479/",
+  "workBranch": "main",
+  "mode": "prd",
+  "prdId": "prd-marketing-site-redesign",
+  "pipelineMode": "batched",
+  "startedAt": "2026-06-03T08:00:00Z",
+  "currentStory": "S-01",
+  "postStoryReviewPending": false,
+  "sessionGapReport": null,
+  "specialistsBlock": null,
+  "resumePrompt": "Resuming prd-marketing-site-redesign. No stories complete yet."
+}

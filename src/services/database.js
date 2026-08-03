@@ -676,19 +676,39 @@ export const subscribeSharedItems = (ownerUid, listId, callback) => {
 // ---------------------------------------------------------------------------
 
 /**
- * Adds a history entry for an item name.
- * @param {string} userId - User ID
- * @param {string} name - Item name to record
+ * Builds a history insert row mirroring an item's reusable "template" fields.
+ * Edits to these fields are kept in sync afterward by a DB trigger
+ * (see supabase migration 20260803120000_mirror_items_to_history.sql).
+ * @param {string} userId
+ * @param {string} listId
+ * @param {string} name
+ * @param {object} [fields] - imageUrl, category, storeId, quantity, price, unit, note
+ * @returns {object} Row for insertion into `history`.
  */
-export const addHistoryEntry = async (userId, listId, name, imageUrl = null) => {
-  try {
-    const { error } = await supabase.from('history').insert({
-      user_id: userId,
-      list_id: listId,
-      name,
-      image_url: imageUrl,
-    });
+const historyRow = (userId, listId, name, fields = {}) => ({
+  user_id: userId,
+  list_id: listId,
+  name,
+  image_url: fields.imageUrl ?? null,
+  category: fields.category ?? null,
+  store_id: fields.storeId ?? null,
+  quantity: fields.quantity ?? null,
+  price: fields.price ?? null,
+  unit: fields.unit ?? null,
+  note: fields.note ?? null,
+});
 
+/**
+ * Adds a history entry mirroring an item's reusable fields, so the item can be
+ * restored in full when re-added from suggestions.
+ * @param {string} userId - User ID
+ * @param {string} listId - List the item was added to
+ * @param {string} name - Item name
+ * @param {object} [fields] - Mirrored fields: imageUrl, category, storeId, quantity, price, unit, note
+ */
+export const addHistoryEntry = async (userId, listId, name, fields = {}) => {
+  try {
+    const { error } = await supabase.from('history').insert(historyRow(userId, listId, name, fields));
     if (error) throw error;
   } catch (error) {
     throw new Error(`Failed to add history entry: name=${name}`, { cause: error });
@@ -696,37 +716,17 @@ export const addHistoryEntry = async (userId, listId, name, imageUrl = null) => 
 };
 
 /**
- * Adds multiple history entries in a single batch insert.
+ * Adds multiple history entries (mirroring each item's fields) in one insert.
  * @param {string} userId - The authenticated user's ID
  * @param {string} listId - The list these items were added to
- * @param {string[]} names - Array of item names to add to history
+ * @param {Array<{name: string, imageUrl?: string, category?: string, storeId?: string, quantity?: number, price?: number, unit?: string, note?: string}>} entries
  */
-export const addHistoryEntries = async (userId, listId, names) => {
-  if (!names.length) return;
-  const rows = names.map((name) => ({ user_id: userId, list_id: listId, name }));
+export const addHistoryEntries = async (userId, listId, entries) => {
+  if (!entries.length) return;
+  const rows = entries.map((e) => historyRow(userId, listId, e.name, e));
   const { error } = await supabase.from('history').insert(rows);
   if (error) {
     throw new Error('Failed to add history entries', { cause: error });
-  }
-};
-
-/**
- * Records an item's image on its list-scoped history rows so the image carries
- * over when the item is later re-added from suggestions. Matches by list and
- * (case-sensitive) name; names are normalized via capitalize() at add time.
- * @param {string} listId - The list the item belongs to
- * @param {string} name - The item name
- * @param {string|null} imageUrl - The image URL to record (null clears it)
- */
-export const setHistoryImageForItem = async (listId, name, imageUrl) => {
-  if (!listId || !name) return;
-  const { error } = await supabase
-    .from('history')
-    .update({ image_url: imageUrl })
-    .eq('list_id', listId)
-    .eq('name', name);
-  if (error) {
-    throw new Error(`Failed to sync history image: name=${name}`, { cause: error });
   }
 };
 
@@ -759,6 +759,12 @@ export const subscribeHistory = (userId, callback) => {
           name: row.name,
           listId: row.list_id,
           imageUrl: row.image_url,
+          category: row.category,
+          storeId: row.store_id,
+          quantity: row.quantity,
+          price: row.price,
+          unit: row.unit,
+          note: row.note,
           addedAt: row.added_at,
         }))
       );

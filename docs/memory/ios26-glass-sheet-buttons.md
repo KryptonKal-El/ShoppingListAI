@@ -50,3 +50,15 @@ Button { ... } label: {
     }
 }
 ```
+
+## Update (2026-06-12): presentationBackground DOES work on medium-detent sheets
+
+On iOS 26.5, a `.presentationDetents([.medium])` sheet renders with the
+translucent glass material (underlying content bleeds through), unlike
+full-height sheets whose `Form` renders an opaque grouped background.
+
+`.presentationBackground(Color(.systemGroupedBackground))` applied to the
+sheet content (on the NavigationStack, alongside presentationDetents) fixed
+it — verified via simulator screenshots in DuplicateListSheet. The "no
+effect" finding above was observed in a different context (full-height
+sheet button visibility on 26.2); don't assume it applies to detent sheets.

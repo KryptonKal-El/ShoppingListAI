@@ -1,7 +1,7 @@
 ---
 description: Implementation sub-agent for React + Vite + Supabase projects. Project-level — lives in this repo's .opencode/agents/. Receives story briefs from Concepture-Builder via Concepture-Developer.
 mode: subagent
-model: github-copilot/gpt-5.5
+model: github-copilot/claude-haiku-4.5
 temperature: 0.2
 ---
 

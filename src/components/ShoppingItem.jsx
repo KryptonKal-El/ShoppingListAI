@@ -42,7 +42,7 @@ const formatDueDateLabel = (dateStr) => {
  * stepper, price input, store/category pickers, and delete button.
  * Field visibility is determined by the list type configuration.
  */
-export const ShoppingItem = ({ item, isChecked = undefined, stores = [], listType = 'grocery', listCategories = null, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, isRestored = false, onRestoreAnimationDone = null, onNavigateToSettings = null }) => {
+export const ShoppingItem = ({ item, isChecked = undefined, stores = [], listType = 'grocery', listCategories = null, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, isRestored = false, onRestoreAnimationDone = null, onNavigateToSettings = null, hideStorePill = false, hideCategoryPill = false }) => {
   const { user } = useAuth();
   const imageSearchSettings = user?.profile?.imageSearchSettings;
   const typeConfig = getTypeConfig(listType);
@@ -544,12 +544,12 @@ export const ShoppingItem = ({ item, isChecked = undefined, stores = [], listTyp
                 </span>
                 {item.note && <span className={styles.note}>{item.note}</span>}
                 <div className={styles.badges}>
-                  {fields.store && assignedStore && (
+                  {fields.store && assignedStore && !hideStorePill && (
                     <span className={styles.storeBadgeCompact} style={{ backgroundColor: assignedStore.color }}>
                       {assignedStore.name}
                     </span>
                   )}
-                  {fields.category && item.category && (
+                  {fields.category && item.category && !hideCategoryPill && (
                     <span
                       className={styles.categoryCompact}
                       style={{ backgroundColor: allColors[item.category] ?? '#9e9e9e' }}
@@ -982,5 +982,7 @@ ShoppingItem.propTypes = {
   isRestored: PropTypes.bool,
   onRestoreAnimationDone: PropTypes.func,
   onNavigateToSettings: PropTypes.func,
+  hideStorePill: PropTypes.bool,
+  hideCategoryPill: PropTypes.bool,
 };
 

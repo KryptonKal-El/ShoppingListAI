@@ -18,9 +18,50 @@ const renameIndexToApp = {
   },
 }
 
+/**
+ * Builds URL-rewrite middleware that mirrors the production Vercel rewrites
+ * (see vercel.json): `/` serves the marketing page, `/support` the support page,
+ * and `/app` / `/app/*` the React app.
+ * @param {string} appEntry - File the app routes resolve to: `/index.html` in dev,
+ *   or the built `/app.html` for `vite preview` (index.html is renamed at build time).
+ * @returns {import('vite').Connect.NextHandleFunction}
+ */
+const prodRewrites = (appEntry) => (req, _res, next) => {
+  const [pathname] = (req.url ?? '/').split('?')
+  if (pathname === '/') {
+    req.url = '/index-marketing.html'
+  } else if (pathname === '/support') {
+    req.url = '/support.html'
+  } else if (pathname === '/app' || pathname.startsWith('/app/')) {
+    req.url = appEntry
+  }
+  next()
+}
+
+/** Dev server: mirror prod routing; `/app` resolves to the dev entry `index.html`. */
+/** @type {import('vite').Plugin} */
+const devProdRoutes = {
+  name: 'dev-prod-routes',
+  apply: 'serve',
+  configureServer(server) {
+    server.middlewares.use(prodRewrites('/index.html'))
+  },
+}
+
+/** Preview server: mirror prod routing over the built output; `/app` → `app.html`. */
+/** @type {import('vite').Plugin} */
+const previewProdRoutes = {
+  name: 'preview-prod-routes',
+  configurePreviewServer(server) {
+    server.middlewares.use(prodRewrites('/app.html'))
+  },
+}
+
 export default defineConfig({
   plugins: [
     react(),
+    devProdRoutes,
+    previewProdRoutes,
     renameIndexToApp,
     VitePWA({
       registerType: 'prompt',

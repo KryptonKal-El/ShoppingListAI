@@ -1,7 +1,7 @@
 ---
 description: Vitest + React Testing Library test writer and test reviewer sub-agent for React/Vite projects. Project-level — lives in this repo's .opencode/agents/.
 mode: subagent
-model: github-copilot/gpt-5.5
+model: github-copilot/claude-haiku-4.5
 temperature: 0.1
 ---
 

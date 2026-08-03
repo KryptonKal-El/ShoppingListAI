@@ -1,0 +1,59 @@
+{
+  "id": "prd-collaborator-edit-access",
+  "name": "Collaborator Edit Access on Shared Lists",
+  "status": "completed",
+  "startedAt": "2026-06-03T00:00:00Z",
+  "completedAt": "2026-06-03T19:21:02.351Z",
+  "stories": [
+    {
+      "id": "S-1",
+      "title": "Unlock Edit Categories for Collaborators (React Web)",
+      "status": "skipped",
+      "completedAt": null,
+      "passes": null,
+      "notes": "Already implemented prior to this session.",
+      "description": "As a collaborator on a shared list, I want to be able to edit the list's categories, so that I can help keep the list organized without needing the owner to do it for me.",
+      "acceptanceCriteria": [
+        "The 'Edit Categories' menu item in ListSelector is shown for both owners and collaborators (remove the isOwned gate on that item only).",
+        "The 'Edit Categories' menu item in any other location that gates it behind isOwned is similarly unlocked.",
+        "The updateListDetails action that persists category changes is already permitted by RLS (lists_update_own_or_shared); no backend change is needed.",
+        "Share Settings, Delete List, List Type change, and Reset items remain gated behind isOwned — no other isOwned checks are touched.",
+        "npm run build succeeds."
+      ],
+      "flowChart": "1. src/components/ListSelector.jsx\n   ├─ Remove isOwned gate from 'Edit Categories' menu item (desktop, line ~388)\n   └─ Remove isOwned gate from 'Edit Categories' menu item (mobile, line ~479)\n\n2. Any other component gating Edit Categories behind isOwned\n   └─ Remove gate (verify via grep)\n\n3. VERIFY QUALITY\n   ├─ Run lint\n   └─ Run build"
+    },
+    {
+      "id": "S-2",
+      "title": "Fix: Share Settings Visible to Collaborators in Mobile Detail View (React Web)",
+      "status": "skipped",
+      "completedAt": null,
+      "passes": null,
+      "notes": "Already implemented prior to this session.",
+      "description": "As a collaborator, I want the Share Settings button to not appear in my list detail menu, so that the UI is consistent and I'm not shown controls I can't use.",
+      "acceptanceCriteria": [
+        "MobileListDetail.jsx currently gates Share Settings behind !isGuest. isGuest is a prop that App.jsx never passes, so it always defaults to false — making Share Settings always visible.",
+        "The fix: replace the !isGuest gate with isOwned (derived from !list._isShared, consistent with how ListSelector.jsx gates it).",
+        "Share Settings no longer appears in the MobileListDetail 3-dot menu for collaborators.",
+        "Share Settings continues to appear for owners.",
+        "npm run build succeeds."
+      ],
+      "flowChart": "1. src/components/MobileListDetail.jsx\n   ├─ Derive isOwned: const isOwned = !list._isShared (line ~60)\n   ├─ Replace !isGuest gate on Share Settings (desktop, line ~121) with isOwned\n   └─ Replace !isGuest gate on Share Settings (mobile, line ~175) with isOwned\n\n2. VERIFY QUALITY\n   ├─ Run lint\n   └─ Run build"
+    },
+    {
+      "id": "S-3",
+      "title": "iOS: Match Collaborator Edit Access",
+      "status": "completed",
+      "completedAt": "2026-06-03T19:21:02.351Z",
+      "passes": true,
+      "notes": "Collaborator 3-dot menu implemented. S-1 and S-2 confirmed already implemented.",
+      "description": "As an iOS collaborator, I want the native iOS app to reflect the same permissions as the web app, so that what I can do on iOS is consistent with what I can do on web.",
+      "acceptanceCriteria": [
+        "Edit Categories is accessible to collaborators on iOS.",
+        "Share Settings, Delete List, List Type change, and Reset items remain owner-only on iOS.",
+        "Share Settings is not shown to collaborators in any iOS list detail view.",
+        "App builds successfully (npm run cap:ios or Xcode build succeeds)."
+      ],
+      "flowChart": "1. iOS list detail / settings view\n   ├─ Remove isOwner gate from Edit Categories\n   └─ Ensure Share Settings, Delete List, List Type, Reset items remain owner-only\n\n2. iOS share settings visibility check\n   └─ Confirm Share Settings is hidden for collaborators in all iOS views\n\n3. VERIFY QUALITY\n   └─ Xcode build succeeds"
+    }
+  ]
+}

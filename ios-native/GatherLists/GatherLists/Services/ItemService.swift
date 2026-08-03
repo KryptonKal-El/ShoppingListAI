@@ -16,21 +16,7 @@ struct ItemService {
             .value
         return items
     }
-    
-    /// Finds the most recent item with a matching name across all of a user's owned lists.
-    static func fetchLastItemByName(_ name: String, userId: UUID) async throws -> Item? {
-        let items: [Item] = try await client
-            .from("items")
-            .select("*, lists!inner(owner_id)")
-            .eq("lists.owner_id", value: userId)
-            .ilike("name", pattern: name)
-            .order("added_at", ascending: false)
-            .limit(1)
-            .execute()
-            .value
-        return items.first
-    }
-    
+
     /// Adds a new item to a list with auto-categorization.
     static func addItem(
         listId: UUID,

@@ -21,9 +21,26 @@ struct HistoryService {
         return entries
     }
 
-    /// Adds a single history entry scoped to a list.
-    static func addHistoryEntry(userId: UUID, listId: UUID, name: String, imageUrl: String? = nil) async throws {
-        let entry = NewHistoryEntry(userId: userId, listId: listId, name: name, imageUrl: imageUrl)
+    /// Adds a single history entry mirroring an item's reusable fields, so the
+    /// item can be restored in full when re-added from suggestions. Edits are
+    /// kept in sync afterward by a DB trigger.
+    static func addHistoryEntry(
+        userId: UUID,
+        listId: UUID,
+        name: String,
+        imageUrl: String? = nil,
+        category: String? = nil,
+        storeId: UUID? = nil,
+        quantity: Int? = nil,
+        price: Decimal? = nil,
+        unit: String? = nil,
+        note: String? = nil
+    ) async throws {
+        let entry = NewHistoryEntry(
+            userId: userId, listId: listId, name: name, imageUrl: imageUrl,
+            category: category, storeId: storeId, quantity: quantity,
+            price: price, unit: unit, note: note
+        )
         try await client
             .from("history")
             .insert(entry)
@@ -33,22 +50,13 @@ struct HistoryService {
     /// Batch inserts multiple history entries scoped to a list.
     static func addHistoryEntries(userId: UUID, listId: UUID, names: [String]) async throws {
         guard !names.isEmpty else { return }
-        let entries = names.map { NewHistoryEntry(userId: userId, listId: listId, name: $0, imageUrl: nil) }
+        let entries = names.map {
+            NewHistoryEntry(userId: userId, listId: listId, name: $0, imageUrl: nil,
+                            category: nil, storeId: nil, quantity: nil, price: nil, unit: nil, note: nil)
+        }
         try await client
             .from("history")
             .insert(entries)
-            .execute()
-    }
-
-    /// Records an item's image on its list-scoped history rows so the image
-    /// carries over when the item is later re-added from suggestions. Matches by
-    /// list and name (names are capitalized consistently at add time).
-    static func setHistoryImageForItem(listId: UUID, name: String, imageUrl: String?) async throws {
-        try await client
-            .from("history")
-            .update(HistoryImageUpdate(imageUrl: imageUrl))
-            .eq("list_id", value: listId)
-            .eq("name", value: name)
             .execute()
     }
 }
@@ -60,25 +68,23 @@ private struct NewHistoryEntry: Encodable {
     let listId: UUID
     let name: String
     let imageUrl: String?
+    let category: String?
+    let storeId: UUID?
+    let quantity: Int?
+    let price: Decimal?
+    let unit: String?
+    let note: String?
 
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case listId = "list_id"
         case name
         case imageUrl = "image_url"
-    }
-}
-
-private struct HistoryImageUpdate: Encodable {
-    let imageUrl: String?
-
-    enum CodingKeys: String, CodingKey {
-        case imageUrl = "image_url"
-    }
-
-    // Always encode the key (writing null when clearing) so the column updates.
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(imageUrl, forKey: .imageUrl)
+        case category
+        case storeId = "store_id"
+        case quantity
+        case price
+        case unit
+        case note
     }
 }

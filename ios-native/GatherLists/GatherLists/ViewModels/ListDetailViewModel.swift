@@ -42,6 +42,10 @@ final class ListDetailViewModel {
     let listType: String
     private var list: GatherList?
     @ObservationIgnored private let runtime = RuntimeState()
+
+    /// The environment undo manager, injected by the view so crossing an item
+    /// off (or on) can register a shake-to-undo action.
+    @ObservationIgnored weak var undoManager: UndoManager?
     
     var isSharedList: Bool { ownerId != userId }
     
@@ -299,54 +303,54 @@ final class ListDetailViewModel {
             lastAddedItemId = newItem.id
             
             let capitalizedName = name.prefix(1).uppercased() + name.dropFirst()
-            try await HistoryService.addHistoryEntry(userId: userId, listId: listId, name: capitalizedName)
+            try await HistoryService.addHistoryEntry(
+                userId: userId, listId: listId, name: capitalizedName,
+                imageUrl: newItem.imageUrl, category: newItem.category, storeId: newItem.storeId,
+                quantity: newItem.quantity, price: newItem.price, unit: newItem.unit, note: newItem.note
+            )
         } catch {
             self.error = error.localizedDescription
             print("[ListDetailViewModel] Failed to add item: \(error.localizedDescription)")
         }
     }
 
-    /// Most recent non-empty image recorded in this list's history for a name.
-    private func latestHistoryImage(for name: String) -> String? {
+    /// Most recent history record for a name on this list — the item's mirrored
+    /// "template". history is ordered oldest-first, so the last match is newest.
+    /// Sourced from history (not the live items table) so reuse survives the
+    /// item being removed and works on shared lists.
+    private func latestHistoryEntry(for name: String) -> HistoryEntry? {
         let key = name.lowercased()
-        var image: String?
-        for entry in historyEntries where entry.name.lowercased() == key {
-            if let entryImage = entry.imageUrl, !entryImage.isEmpty {
-                image = entryImage
-            }
-        }
-        return image
+        return historyEntries.last(where: { $0.name.lowercased() == key })
     }
-    
-    /// Adds an item from a history suggestion, carrying over data from the most recent past item.
+
+    /// Adds an item from a history suggestion, restoring the item's latest saved
+    /// fields from its history template.
     func addItemFromSuggestion(name: String, fallbackStoreId: UUID?) async {
         do {
-            let pastItem = try await ItemService.fetchLastItemByName(name, userId: userId)
-            // Prefer the list-scoped history image: it survives the item being
-            // removed and is shared across collaborators, unlike fetchLastItemByName
-            // (which only sees the user's own lists' current items).
-            let carriedImage = latestHistoryImage(for: name) ?? pastItem?.imageUrl
-
-            let storeId = pastItem?.storeId ?? fallbackStoreId
-            let rsvpDefault: String? = pastItem?.rsvpStatus ?? (listType == "guest_list" ? "invited" : nil)
+            let template = latestHistoryEntry(for: name)
+            let rsvpDefault: String? = listType == "guest_list" ? "invited" : nil
             let newItem = try await ItemService.addItem(
                 listId: listId,
                 name: name,
-                category: pastItem?.category,
-                storeId: storeId,
+                category: template?.category,
+                storeId: template?.storeId ?? fallbackStoreId,
                 listCategories: listCategories,
                 listType: listType,
-                quantity: pastItem?.quantity ?? 1,
-                price: pastItem?.price,
-                imageUrl: carriedImage,
-                unit: pastItem?.unit ?? "each",
+                quantity: template?.quantity ?? 1,
+                price: template?.price,
+                imageUrl: template?.imageUrl,
+                unit: template?.unit ?? "each",
                 rsvpStatus: rsvpDefault
             )
             items.append(newItem)
             lastAddedItemId = newItem.id
 
             let capitalizedName = name.prefix(1).uppercased() + name.dropFirst()
-            try await HistoryService.addHistoryEntry(userId: userId, listId: listId, name: capitalizedName, imageUrl: carriedImage)
+            try await HistoryService.addHistoryEntry(
+                userId: userId, listId: listId, name: capitalizedName,
+                imageUrl: newItem.imageUrl, category: newItem.category, storeId: newItem.storeId,
+                quantity: newItem.quantity, price: newItem.price, unit: newItem.unit, note: newItem.note
+            )
         } catch {
             self.error = error.localizedDescription
             print("[ListDetailViewModel] Failed to add item from suggestion: \(error.localizedDescription)")
@@ -355,10 +359,12 @@ final class ListDetailViewModel {
     
     func toggleItem(_ item: Item) async {
         do {
-            try await ItemService.toggleItem(itemId: item.id, isChecked: !item.isChecked)
+            let newChecked = !item.isChecked
+            try await ItemService.toggleItem(itemId: item.id, isChecked: newChecked)
             if let index = items.firstIndex(where: { $0.id == item.id }) {
-                items[index].isChecked.toggle()
+                items[index].isChecked = newChecked
             }
+            registerToggleUndo(item: item, newChecked: newChecked)
         } catch {
             self.error = error.localizedDescription
             print("[ListDetailViewModel] Failed to toggle item: \(error.localizedDescription)")
@@ -405,6 +411,7 @@ final class ListDetailViewModel {
             if let updatedIndex = items.firstIndex(where: { $0.id == itemId }) {
                 items[updatedIndex].isChecked = nextChecked
             }
+            registerToggleUndo(item: currentItem, newChecked: nextChecked)
         } catch {
             self.error = error.localizedDescription
             print("[ListDetailViewModel] Failed to commit pending toggle for item \(itemId): \(error.localizedDescription)")
@@ -421,7 +428,36 @@ final class ListDetailViewModel {
         runtime.pendingToggleTasks.removeAll()
         pendingToggleStates.removeAll()
     }
-    
+
+    /// Sets an item's checked state to an explicit value. Used by shake-to-undo
+    /// to reverse a cross-off without depending on the current state.
+    func setChecked(_ itemId: UUID, to checked: Bool) async {
+        do {
+            try await ItemService.toggleItem(itemId: itemId, isChecked: checked)
+            if let index = items.firstIndex(where: { $0.id == itemId }) {
+                items[index].isChecked = checked
+            }
+        } catch {
+            self.error = error.localizedDescription
+            print("[ListDetailViewModel] Failed to set checked for item \(itemId): \(error.localizedDescription)")
+        }
+    }
+
+    /// Registers a shake-to-undo action that reverses crossing an item off (or on).
+    /// Called once the toggle has actually committed so a cancelled pending
+    /// toggle never leaves a stale undo on the stack.
+    private func registerToggleUndo(item: Item, newChecked: Bool) {
+        guard let undoManager else { return }
+        let itemId = item.id
+        let previous = !newChecked
+        undoManager.registerUndo(withTarget: UndoHelper.shared) { [weak self] _ in
+            Task { @MainActor in
+                await self?.setChecked(itemId, to: previous)
+            }
+        }
+        undoManager.setActionName(newChecked ? "Cross Off \(item.name)" : "Uncross \(item.name)")
+    }
+
     @discardableResult
     func deleteItem(_ item: Item) async -> Item? {
         do {
@@ -528,11 +564,8 @@ final class ListDetailViewModel {
                 }
             }
 
-            // Keep the item's suggestion-history image in sync so it carries over
-            // when the item is later re-added from suggestions.
-            if let imageUrl = imageUrl, let itemName = items.first(where: { $0.id == itemId })?.name {
-                try? await HistoryService.setHistoryImageForItem(listId: listId, name: itemName, imageUrl: imageUrl)
-            }
+            // Item -> history sync (rename, image, and every mirrored field) is
+            // handled by a DB trigger; see 20260803120000_mirror_items_to_history.sql.
         } catch {
             self.error = error.localizedDescription
             print("[ListDetailViewModel] Failed to update item: \(error.localizedDescription)")

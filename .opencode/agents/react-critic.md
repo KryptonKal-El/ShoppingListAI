@@ -1,7 +1,7 @@
 ---
 description: React/JS critic sub-agent for .js, .jsx, .ts, and .tsx source files (excluding tests). Project-level — lives in this repo's .opencode/agents/.
 mode: subagent
-model: github-copilot/gpt-5.5
+model: github-copilot/claude-haiku-4.5
 temperature: 0.0
 ---
 

@@ -4,7 +4,8 @@
     {
       "id": "prd-marketing-site-redesign",
       "name": "Marketing Site Redesign",
-      "status": "ready",
+      "status": "in_progress",
+      "startedAt": "2026-06-03T08:00:00Z",
       "filePath": "docs/prds/prd-marketing-site-redesign.md",
       "jsonPath": "docs/prds/prd-marketing-site-redesign.json",
       "createdAt": "2026-06-03T00:00:00Z",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { applySortPipeline, SYSTEM_DEFAULT_SORT_CONFIG } from '../utils/sortPipeline.js';
+import { applySortPipeline, partitionSortConfig, SYSTEM_DEFAULT_SORT_CONFIG } from '../utils/sortPipeline.js';
 import { formatPrice } from '../utils/formatPrice.js';
 import { ConfirmDialog } from './ConfirmDialog.jsx';
 import { ShoppingItem } from './ShoppingItem.jsx';
@@ -54,7 +54,7 @@ const collectGroupItems = (group) => {
 };
 
 /** Renders a flat list of ShoppingItem components. */
-const ItemList = ({ items, stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings }) => (
+const ItemList = ({ items, stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings, hideStorePill, hideCategoryPill }) => (
   <>
     {items.map((item) => (
       <ShoppingItem
@@ -72,14 +72,16 @@ const ItemList = ({ items, stores, listType, listCategories, restoredItemIds, on
         onUpdateStore={onUpdateStore}
         onUpdateItem={onUpdateItem}
         onNavigateToSettings={onNavigateToSettings}
+        hideStorePill={hideStorePill}
+        hideCategoryPill={hideCategoryPill}
       />
     ))}
   </>
 );
 
 /** Renders a group recursively — depth 0 = prominent collapsible card, depth 1+ = small sub-header. */
-const GroupRenderer = ({ group, depth = 0, collapsedGroups, onToggleGroup, stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings }) => {
-  const itemProps = { stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings };
+const GroupRenderer = ({ group, depth = 0, collapsedGroups, onToggleGroup, stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings, hideStorePill, hideCategoryPill }) => {
+  const itemProps = { stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings, hideStorePill, hideCategoryPill };
 
   const allItems = collectGroupItems(group);
   const count = group.type === 'rsvp' ? allItems.reduce((sum, item) => sum + (item.quantity ?? 1), 0) : allItems.length;
@@ -222,7 +224,13 @@ export const ShoppingList = ({
   const checkedFlat = checkedResult.items
     ?? [...checkedResult.groups.flatMap(collectGroupItems), ...(checkedResult.ungrouped ?? [])];
 
-  const itemProps = { stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings };
+  // When items are grouped by store/category, the per-item pill duplicates the
+  // group heading — so hide it for any dimension the list is grouped by.
+  const { groupLevels } = partitionSortConfig(config);
+  const hideStorePill = groupLevels.includes('store');
+  const hideCategoryPill = groupLevels.includes('category');
+
+  const itemProps = { stores, listType, listCategories, restoredItemIds, onRestoreAnimationDone, getEffectiveChecked, onToggle, onRemove, onUpdateCategory, onUpdateStore, onUpdateItem, onNavigateToSettings, hideStorePill, hideCategoryPill };
   const groupProps = { collapsedGroups, onToggleGroup: handleToggleGroup, ...itemProps };
 
   return (
@@ -329,7 +337,8 @@ export const ShoppingList = ({
             )}
             {!isCrossedCollapsed && (
               <div className={styles.topLevelBody}>
-                <ItemList items={checkedFlat} {...itemProps} />
+                {/* Crossed items are a flat list, so show every pill regardless of grouping. */}
+                <ItemList items={checkedFlat} {...itemProps} hideStorePill={false} hideCategoryPill={false} />
               </div>
             )}
           </div>

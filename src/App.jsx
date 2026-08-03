@@ -172,9 +172,9 @@ export const App = () => {
     onCommitToggle: handleCommitToggleItem,
   });
 
-  const handleAddItem = (name, storeId = null, imageUrl = null) => {
+  const handleAddItem = (name, storeId = null, template = null) => {
     if (!activeList) return;
-    actions.addItem(activeList.id, name, storeId, imageUrl);
+    actions.addItem(activeList.id, name, storeId, template);
   };
 
   const handleToggleItem = (item) => {

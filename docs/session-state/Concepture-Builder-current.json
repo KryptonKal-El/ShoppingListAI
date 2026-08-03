@@ -1,13 +1,14 @@
 {
-  "sessionId": null,
-  "sessionDir": null,
+  "sessionId": "builder-1780492663-95a289",
+  "sessionDir": "docs/sessions/builder-1780492663-95a289/",
   "workBranch": "main",
-  "mode": null,
-  "prdId": null,
-  "pipelineMode": null,
-  "startedAt": null,
-  "currentStory": null,
+  "mode": "prd",
+  "prdId": "prd-app-store-distribution",
+  "pipelineMode": "per-story",
+  "startedAt": "2026-06-03T00:00:00Z",
+  "currentStory": "US-005",
   "postStoryReviewPending": false,
-  "sessionGapReport": "docs/toolkit-gaps/2026-06-02-builder-gap-report.md",
-  "specialistsBlock": null
+  "sessionGapReport": null,
+  "specialistsBlock": null,
+  "resumePrompt": "Resuming prd-app-store-distribution in per-story mode. US-001 through US-004 complete and committed. US-005 (Create Screenshot Test Data) and US-006 (Capture App Store Screenshots) are manual Simulator steps — paused for human to complete. Resume at US-005 or skip to US-007 (Screenshot README)."
 }
