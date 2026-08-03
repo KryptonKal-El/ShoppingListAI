@@ -332,6 +332,7 @@ final class ListDetailViewModel {
             let newItem = try await ItemService.addItem(
                 listId: listId,
                 name: name,
+                note: template?.note,
                 category: template?.category,
                 storeId: template?.storeId ?? fallbackStoreId,
                 listCategories: listCategories,
