@@ -18,6 +18,7 @@ final class ListDetailViewModel {
         var sharedStoresTask: Task<Void, Never>?
         var historyTask: Task<Void, Never>?
         var pendingToggleTasks: [UUID: Task<Void, Never>] = [:]
+        var pendingToggleOriginals: [UUID: Bool] = [:]
     }
 
     // Published state
@@ -190,8 +191,8 @@ final class ListDetailViewModel {
                 return
             }
             for await _ in itemsChanges {
-                cancelAllPendingToggles()
                 await refetchItems()
+                clearStalePendingToggles()
             }
         }
         
@@ -379,14 +380,13 @@ final class ListDetailViewModel {
 
     /// Schedules a delayed item toggle, or cancels the pending toggle if one already exists.
     func scheduleToggleItem(_ item: Item) {
-        if let existingTask = runtime.pendingToggleTasks[item.id] {
-            existingTask.cancel()
-            runtime.pendingToggleTasks.removeValue(forKey: item.id)
-            pendingToggleStates.removeValue(forKey: item.id)
+        if runtime.pendingToggleTasks[item.id] != nil {
+            clearPendingToggle(itemId: item.id)
             return
         }
 
         pendingToggleStates[item.id] = !item.isChecked
+        runtime.pendingToggleOriginals[item.id] = item.isChecked
 
         let itemId = item.id
         runtime.pendingToggleTasks[itemId] = Task { [weak self] in
@@ -399,13 +399,12 @@ final class ListDetailViewModel {
 
     private func commitPendingToggle(itemId: UUID) async {
         guard let index = items.firstIndex(where: { $0.id == itemId }) else {
-            runtime.pendingToggleTasks.removeValue(forKey: itemId)
-            pendingToggleStates.removeValue(forKey: itemId)
+            clearPendingToggle(itemId: itemId)
             return
         }
 
         let currentItem = items[index]
-        let nextChecked = !currentItem.isChecked
+        let nextChecked = pendingToggleStates[itemId] ?? !currentItem.isChecked
 
         do {
             try await ItemService.toggleItem(itemId: itemId, isChecked: nextChecked)
@@ -418,16 +417,27 @@ final class ListDetailViewModel {
             print("[ListDetailViewModel] Failed to commit pending toggle for item \(itemId): \(error.localizedDescription)")
         }
 
+        clearPendingToggle(itemId: itemId)
+    }
+
+    private func clearPendingToggle(itemId: UUID) {
+        runtime.pendingToggleTasks[itemId]?.cancel()
         runtime.pendingToggleTasks.removeValue(forKey: itemId)
+        runtime.pendingToggleOriginals.removeValue(forKey: itemId)
         pendingToggleStates.removeValue(forKey: itemId)
     }
 
-    private func cancelAllPendingToggles() {
-        for task in runtime.pendingToggleTasks.values {
-            task.cancel()
+    /// Clears pending toggles whose item was changed remotely (or removed) while
+    /// the delay was running. A realtime echo of one item's own commit must not
+    /// cancel other items' still-pending toggles.
+    private func clearStalePendingToggles() {
+        for (itemId, originalChecked) in runtime.pendingToggleOriginals {
+            let currentItem = items.first(where: { $0.id == itemId })
+            if let currentItem, currentItem.isChecked == originalChecked {
+                continue
+            }
+            clearPendingToggle(itemId: itemId)
         }
-        runtime.pendingToggleTasks.removeAll()
-        pendingToggleStates.removeAll()
     }
 
     /// Sets an item's checked state to an explicit value. Used by shake-to-undo
