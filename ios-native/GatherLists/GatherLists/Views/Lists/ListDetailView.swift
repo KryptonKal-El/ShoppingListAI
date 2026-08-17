@@ -76,11 +76,11 @@ struct ListDetailView: View {
         itemName.trimmingCharacters(in: .whitespaces).isEmpty
     }
     
-    private var filteredSuggestions: [String] {
+    private var filteredSuggestions: [ListDetailViewModel.HistorySuggestion] {
         guard !isItemNameEmpty, let vm = detailViewModel else { return [] }
         let query = itemName.lowercased()
-        return vm.uniqueHistoryNames
-            .filter { $0.lowercased().contains(query) }
+        return vm.historySuggestions
+            .filter { $0.name.lowercased().contains(query) }
             .prefix(5)
             .map { $0 }
     }
@@ -1457,22 +1457,35 @@ struct ListDetailView: View {
     
     private var suggestionsOverlay: some View {
         VStack(spacing: 0) {
-            ForEach(filteredSuggestions, id: \.self) { suggestion in
+            ForEach(filteredSuggestions) { suggestion in
                 Button {
-                    let storeId = selectedStoreId
+                    let fallbackStoreId = selectedStoreId
                     itemName = ""
                     isInputFocused = true
                     Task {
-                        await detailViewModel?.addItemFromSuggestion(name: suggestion, fallbackStoreId: storeId)
+                        await detailViewModel?.addItemFromSuggestion(
+                            name: suggestion.name,
+                            storeId: suggestion.storeId,
+                            fallbackStoreId: fallbackStoreId
+                        )
                     }
                 } label: {
                     HStack {
                         Image(systemName: "clock.arrow.circlepath")
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
-                        Text(suggestion)
+                        Text(suggestion.name)
                             .foregroundStyle(.primary)
                         Spacer()
+                        if let storeName = detailViewModel?.storeName(for: suggestion.storeId) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "storefront")
+                                    .font(.caption2)
+                                Text(storeName)
+                                    .font(.caption)
+                            }
+                            .foregroundStyle(.secondary)
+                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)

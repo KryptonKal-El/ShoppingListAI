@@ -66,18 +66,37 @@ final class ListDetailViewModel {
         items.filter { $0.isChecked }
     }
     
-    /// Deduplicated names from historyEntries (case-insensitive), sorted alphabetically.
-    var uniqueHistoryNames: [String] {
+    /// A typeahead suggestion from history: an item name plus the store it was
+    /// saved with, so the same product bought at different stores stays distinct.
+    struct HistorySuggestion: Identifiable, Hashable {
+        let name: String
+        let storeId: UUID?
+        var id: String { "\(name.lowercased())|\(storeId?.uuidString ?? "")" }
+    }
+
+    /// Deduplicated (name, store) suggestions from historyEntries
+    /// (case-insensitive on name), sorted alphabetically by name.
+    var historySuggestions: [HistorySuggestion] {
         var seen = Set<String>()
-        var result: [String] = []
+        var result: [HistorySuggestion] = []
         for entry in historyEntries {
-            let lowercased = entry.name.lowercased()
-            if !seen.contains(lowercased) {
-                seen.insert(lowercased)
-                result.append(entry.name)
+            let key = "\(entry.name.lowercased())|\(entry.storeId?.uuidString ?? "")"
+            if !seen.contains(key) {
+                seen.insert(key)
+                result.append(HistorySuggestion(name: entry.name, storeId: entry.storeId))
             }
         }
-        return result.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        return result.sorted {
+            let order = $0.name.localizedCaseInsensitiveCompare($1.name)
+            if order != .orderedSame { return order == .orderedAscending }
+            return storeName(for: $0.storeId) ?? "" < storeName(for: $1.storeId) ?? ""
+        }
+    }
+
+    /// Resolves a store id to its name within this list's stores.
+    func storeName(for storeId: UUID?) -> String? {
+        guard let storeId else { return nil }
+        return stores.first(where: { $0.id == storeId })?.name
     }
     
     // MARK: - Pipeline Methods
@@ -315,27 +334,27 @@ final class ListDetailViewModel {
         }
     }
 
-    /// Most recent history record for a name on this list — the item's mirrored
-    /// "template". history is ordered oldest-first, so the last match is newest.
-    /// Sourced from history (not the live items table) so reuse survives the
-    /// item being removed and works on shared lists.
-    private func latestHistoryEntry(for name: String) -> HistoryEntry? {
+    /// Most recent history record for a (name, store) pair on this list — the
+    /// item's mirrored "template". history is ordered oldest-first, so the last
+    /// match is newest. Sourced from history (not the live items table) so reuse
+    /// survives the item being removed and works on shared lists.
+    private func latestHistoryEntry(for name: String, storeId: UUID?) -> HistoryEntry? {
         let key = name.lowercased()
-        return historyEntries.last(where: { $0.name.lowercased() == key })
+        return historyEntries.last(where: { $0.name.lowercased() == key && $0.storeId == storeId })
     }
 
     /// Adds an item from a history suggestion, restoring the item's latest saved
-    /// fields from its history template.
-    func addItemFromSuggestion(name: String, fallbackStoreId: UUID?) async {
+    /// fields from the template matching the suggestion's name and store.
+    func addItemFromSuggestion(name: String, storeId: UUID?, fallbackStoreId: UUID?) async {
         do {
-            let template = latestHistoryEntry(for: name)
+            let template = latestHistoryEntry(for: name, storeId: storeId)
             let rsvpDefault: String? = listType == "guest_list" ? "invited" : nil
             let newItem = try await ItemService.addItem(
                 listId: listId,
                 name: name,
                 note: template?.note,
                 category: template?.category,
-                storeId: template?.storeId ?? fallbackStoreId,
+                storeId: template?.storeId ?? storeId ?? fallbackStoreId,
                 listCategories: listCategories,
                 listType: listType,
                 quantity: template?.quantity ?? 1,
