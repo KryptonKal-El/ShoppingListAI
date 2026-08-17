@@ -40,7 +40,9 @@ const AUTH_FILE = '.auth/user.json';
 setup('authenticate', async ({ page }) => {
   const { email, password } = loadCredentials();
 
-  await page.goto('/');
+  // The root URL serves the marketing landing page; the app (and its login
+  // form) lives at /app.
+  await page.goto('/app');
 
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
