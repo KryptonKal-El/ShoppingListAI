@@ -19,10 +19,12 @@ const getListButton = (page, listName) => {
 test.describe.serial('Shopping list core flows', () => {
   let page;
 
+  test.skip(({ isMobile }) => isMobile, 'Desktop sidebar flow; mobile has its own navigation');
+
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 10000 });
+    await page.goto('/app');
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test.afterAll(async () => {
@@ -105,8 +107,8 @@ test.describe.serial('Shopping list core flows', () => {
     const applesText = page.locator('span').filter({ hasText: 'Apples' }).first();
     await applesText.dblclick();
 
-    // Verify the item moves to the "Checked" section
-    await expect(page.getByRole('heading', { name: /Checked \(1\)/ })).toBeVisible();
+    // Verify the item moves to the "Crossed" section at the bottom
+    await expect(page.getByText('Crossed', { exact: true })).toBeVisible();
   });
 
   test('clears checked items', async () => {
@@ -115,7 +117,7 @@ test.describe.serial('Shopping list core flows', () => {
     await expect(listHeading).toBeVisible();
     
     // Click the "Clear checked" button to open the confirm dialog
-    const clearCheckedBtn = page.getByRole('button', { name: 'Clear checked' });
+    const clearCheckedBtn = page.getByRole('button', { name: 'Clear crossed', exact: true });
     await expect(clearCheckedBtn).toBeVisible();
     await clearCheckedBtn.click();
 
@@ -139,14 +141,14 @@ test.describe.serial('Shopping list core flows', () => {
     
     // Reload to ensure we get fresh data
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
     
     // Re-select the list after reload
     await getListButton(page, LIST_NAME).click();
     await expect(listHeading).toBeVisible();
     
-    // Now verify the checked section is gone
-    await expect(page.getByRole('heading', { name: /Checked/ })).not.toBeVisible({ timeout: 5000 });
+    // Now verify the crossed section is gone
+    await expect(page.getByText('Crossed', { exact: true })).not.toBeVisible({ timeout: 5000 });
 
     // Verify Apples is no longer in the shopping list items
     // Note: "apples" may still appear in AI Suggestions, so we need to be specific
@@ -214,7 +216,7 @@ test.describe.serial('Shopping list core flows', () => {
     // (similar to clear checked test - realtime may have timing issues)
     await page.waitForTimeout(1000);
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
 
     // Verify the list is removed from the sidebar
     await expect(getListButton(page, LIST_NAME)).not.toBeVisible({ timeout: 5000 });

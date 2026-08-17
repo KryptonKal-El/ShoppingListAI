@@ -52,8 +52,28 @@ The Delete button inside the ShoppingItem edit panel doesn't respond to clicks o
 
 **Fix:** Close the edit panel and use swipe-to-delete as a workaround. See `docs/memory/edit-panel-delete-button-mobile-bug.md` for details.
 
-## Mobile navigation resets on reload
+## Reload restores the last-open list (updated)
 
-After `page.reload()`, the mobile app returns to "My Lists" view, not the detail view.
+OUTDATED: reload used to return the mobile app to the lists view. The app now
+RESTORES the last-open list after `page.reload()`, landing back in the detail
+view. Wait for `button[aria-label="Back to My Lists"]` instead of clicking back
+into the list.
 
-**Fix:** Re-navigate into the list after reload when testing list-level state persistence.
+## The app lives at /app; / is a marketing landing page
+
+`page.goto('/')` reaches the public landing page, which has no login form or
+app UI. All specs (and auth.setup.js) must `page.goto('/app')`.
+
+## Sortable rows swallow accessible names on mobile
+
+The dnd-kit sortable list-row wrapper (`role="button"`, `aria-roledescription="sortable"`)
+can resolve for `getByRole('button', { name: ... })` queries aimed at its nested
+buttons (options menu, action-sheet items), causing strict-mode violations.
+**Fix:** add `exact: true` to those locators.
+
+## Sign-out must stay local-scope
+
+`supabase.auth.signOut()` defaults to scope 'global', revoking EVERY session for
+the user — including the storageState sessions of other running specs and the
+user's other devices. `AuthContext.signOut` passes `{ scope: 'local' }`; keep it
+that way or the e2e suite fails intermittently after auth-flow's logout test.

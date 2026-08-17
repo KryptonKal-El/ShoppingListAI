@@ -175,7 +175,9 @@ export const AuthProvider = ({ children }) => {
    * @returns {Promise<void>}
    */
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    // Local scope: signing out of this browser must not revoke the user's
+    // sessions on other devices (the default 'global' scope does).
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
     if (error) {
       console.error('Sign-out failed:', error);
       throw error;

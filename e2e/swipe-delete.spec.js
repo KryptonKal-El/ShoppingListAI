@@ -173,11 +173,13 @@ const swipeLeftOnItem = async (page, itemName, distance) => {
 test.describe.serial('Swipe-to-delete on mobile', () => {
   let page;
 
+  test.skip(({ isMobile }) => !isMobile, 'Swipe gestures need the mobile touch emulation');
+
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await page.goto('/');
+    await page.goto('/app');
     // Wait for mobile list selector to load (My Lists heading)
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test.afterAll(async () => {
@@ -187,14 +189,14 @@ test.describe.serial('Swipe-to-delete on mobile', () => {
       const backBtn = page.locator('button[aria-label="Back to My Lists"]');
       if (await backBtn.isVisible({ timeout: 1000 })) {
         await backBtn.click();
-        await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 5000 });
+        await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 5000 });
       }
 
-      const optionsBtn = page.getByRole('button', { name: `Options for ${LIST_NAME}` });
+      const optionsBtn = page.getByRole('button', { name: `Options for ${LIST_NAME}`, exact: true });
       if (await optionsBtn.isVisible({ timeout: 1000 })) {
         await optionsBtn.click();
         // On mobile, this uses action sheet pattern with "Delete List" button
-        const deleteOption = page.getByRole('button', { name: 'Delete List' });
+        const deleteOption = page.getByRole('button', { name: 'Delete List', exact: true });
         if (await deleteOption.isVisible({ timeout: 1000 })) {
           await deleteOption.click();
           const confirmBtn = page.locator('[class*="confirmBtn"]');
@@ -211,7 +213,7 @@ test.describe.serial('Swipe-to-delete on mobile', () => {
 
   test('creates a test list and navigates into it', async () => {
     // Click "+ New" button to open the create form
-    await page.getByRole('button', { name: '+ New' }).click();
+    await page.getByRole('button', { name: 'New list' }).click();
 
     // Fill in the list name
     await page.getByPlaceholder('List name...').fill(LIST_NAME);
@@ -258,13 +260,11 @@ test.describe.serial('Swipe-to-delete on mobile', () => {
     // Verify "Swipe Test Apple" is no longer visible
     await expect(getItemByName(page, 'Swipe Test Apple')).not.toBeVisible({ timeout: 5000 });
 
-    // Reload to verify deletion persisted to database
+    // Reload to verify deletion persisted to database. The app restores the
+    // last-open list after reload, landing back in the detail view.
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 5000 });
-    
-    // Navigate back into the test list
-    await getListButton(page, LIST_NAME).click();
-    await expect(page.locator('button[aria-label="Back to My Lists"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('button[aria-label="Back to My Lists"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: LIST_NAME })).toBeVisible({ timeout: 5000 });
     
     // Verify Apple is still gone after reload
     await expect(getItemByName(page, 'Swipe Test Apple')).not.toBeVisible({ timeout: 5000 });
@@ -332,15 +332,15 @@ test.describe.serial('Swipe-to-delete on mobile', () => {
   test('navigates back and deletes the test list', async () => {
     // Navigate back to My Lists
     await page.locator('button[aria-label="Back to My Lists"]').click();
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 5000 });
 
     // Click the options menu for the test list
-    const optionsBtn = page.getByRole('button', { name: `Options for ${LIST_NAME}` });
+    const optionsBtn = page.getByRole('button', { name: `Options for ${LIST_NAME}`, exact: true });
     await expect(optionsBtn).toBeVisible();
     await optionsBtn.click();
 
     // On mobile, delete option is in an action sheet
-    const deleteListBtn = page.getByRole('button', { name: 'Delete List' });
+    const deleteListBtn = page.getByRole('button', { name: 'Delete List', exact: true });
     await expect(deleteListBtn).toBeVisible({ timeout: 5000 });
     await deleteListBtn.click();
 
@@ -359,7 +359,7 @@ test.describe.serial('Swipe-to-delete on mobile', () => {
     // Give database time to sync and reload to verify
     await page.waitForTimeout(1000);
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'My Lists' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
 
     // Verify the list is removed
     await expect(getListButton(page, LIST_NAME)).not.toBeVisible({ timeout: 5000 });

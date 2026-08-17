@@ -40,7 +40,7 @@ test.describe('Auth flow', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('shows login form on unauthenticated visit', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app');
 
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
@@ -52,7 +52,7 @@ test.describe('Auth flow', () => {
   test('logs in with valid credentials', async ({ page }) => {
     const { email, password } = loadCredentials();
 
-    await page.goto('/');
+    await page.goto('/app');
 
     await page.locator('input[type="email"]').fill(email);
     await page.locator('input[type="password"]').fill(password);
@@ -62,13 +62,13 @@ test.describe('Auth flow', () => {
     await expect(page.locator('input[type="email"]')).not.toBeVisible({ timeout: 10000 });
 
     // Verify authenticated content is shown
-    await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test('shows error on invalid credentials', async ({ page }) => {
     const { email } = loadCredentials();
 
-    await page.goto('/');
+    await page.goto('/app');
 
     await page.locator('input[type="email"]').fill(email);
     await page.locator('input[type="password"]').fill('wrongpassword123');
@@ -82,7 +82,7 @@ test.describe('Auth flow', () => {
   });
 
   test('toggles between sign-in and sign-up modes', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app');
 
     // Initial state: Sign In mode
     await expect(page.locator('button[type="submit"]')).toHaveText('Sign In');
@@ -101,10 +101,10 @@ test.describe('Auth flow', () => {
     await expect(page.getByRole('button', { name: /Don't have an account/ })).toBeVisible();
   });
 
-  test('logs out from desktop header', async ({ page }) => {
+  test('logs out from the settings screen', async ({ page }) => {
     const { email, password } = loadCredentials();
 
-    await page.goto('/');
+    await page.goto('/app');
 
     // Log in
     await page.locator('input[type="email"]').fill(email);
@@ -114,8 +114,9 @@ test.describe('Auth flow', () => {
     // Wait for login to complete
     await expect(page.locator('input[type="email"]')).not.toBeVisible({ timeout: 10000 });
 
-    // Click Sign out button
-    await page.getByRole('button', { name: 'Sign out' }).click();
+    // Sign out now lives on the Settings screen (gear on desktop, tab on mobile)
+    await page.getByLabel('Settings').first().click();
+    await page.getByRole('button', { name: 'Sign Out' }).click();
 
     // Wait for login form to reappear
     await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
@@ -127,7 +128,7 @@ test.describe('Auth flow', () => {
   test('preserves session across page reload', async ({ page }) => {
     const { email, password } = loadCredentials();
 
-    await page.goto('/');
+    await page.goto('/app');
 
     // Log in
     await page.locator('input[type="email"]').fill(email);
@@ -141,7 +142,7 @@ test.describe('Auth flow', () => {
     await page.reload();
 
     // Verify still authenticated after reload
-    await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Lists', exact: true })).toBeVisible({ timeout: 10000 });
 
     // Verify login form does NOT appear
     await expect(page.locator('input[type="email"]')).not.toBeVisible();
