@@ -4,21 +4,32 @@ import { getTypeConfig } from '../utils/listTypes.js';
 import styles from './AddItemForm.module.css';
 
 /**
- * Derives a deduplicated, sorted list of unique item names from history.
- * @param {Array<{name: string}>} history
- * @returns {string[]}
+ * Derives deduplicated, sorted suggestions from history, one per (name, store)
+ * pair so the same product bought at different stores stays distinct. History
+ * is ordered oldest-first, so the newest entry per pair wins as the template.
+ * @param {Array<{name: string, storeId?: string}>} history
+ * @param {Array<{id: string, name: string}>} stores
+ * @returns {Array<{key: string, name: string, storeId: string|null, storeName: string|null, template: object}>}
  */
-const getUniqueNames = (history) => {
-  const seen = new Set();
-  const names = [];
+const getSuggestionEntries = (history, stores) => {
+  const byKey = new Map();
   for (const entry of history) {
-    const lower = entry.name.toLowerCase();
-    if (!seen.has(lower)) {
-      seen.add(lower);
-      names.push(entry.name);
-    }
+    const key = `${entry.name.toLowerCase()}|${entry.storeId ?? ''}`;
+    byKey.set(key, entry);
   }
-  return names.sort((a, b) => a.localeCompare(b));
+  return [...byKey.entries()]
+    .map(([key, entry]) => ({
+      key,
+      name: entry.name,
+      storeId: entry.storeId ?? null,
+      storeName: stores.find((s) => s.id === entry.storeId)?.name ?? null,
+      template: entry,
+    }))
+    .sort(
+      (a, b) =>
+        a.name.localeCompare(b.name) ||
+        (a.storeName ?? '').localeCompare(b.storeName ?? '')
+    );
 };
 
 /**
@@ -35,13 +46,19 @@ export const AddItemForm = ({ stores = [], history = [], listType = 'grocery', o
   const wrapperRef = useRef(null);
   const listRef = useRef(null);
 
-  const uniqueNames = useMemo(() => getUniqueNames(history), [history]);
+  const suggestionEntries = useMemo(
+    () => getSuggestionEntries(history, stores),
+    [history, stores]
+  );
+  // The suggestion the user picked from the dropdown; its history template is
+  // passed through on submit so the item restores that store's saved fields.
+  const [pendingSuggestion, setPendingSuggestion] = useState(null);
 
   const suggestions = useMemo(() => {
     const trimmed = value.trim().toLowerCase();
     if (!trimmed) return [];
-    return uniqueNames.filter((name) => name.toLowerCase().includes(trimmed));
-  }, [value, uniqueNames]);
+    return suggestionEntries.filter((s) => s.name.toLowerCase().includes(trimmed));
+  }, [value, suggestionEntries]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -63,8 +80,9 @@ export const AddItemForm = ({ stores = [], history = [], listType = 'grocery', o
     }
   }, [highlightedIndex]);
 
-  const handleSelect = (name) => {
-    setValue(name);
+  const handleSelect = (suggestion) => {
+    setValue(suggestion.name);
+    setPendingSuggestion(suggestion);
     setIsDropdownOpen(false);
     setHighlightedIndex(-1);
   };
@@ -73,14 +91,22 @@ export const AddItemForm = ({ stores = [], history = [], listType = 'grocery', o
     e.preventDefault();
     const trimmed = value.trim();
     if (!trimmed) return;
-    onAdd(trimmed, selectedStore || null);
+    // Only honor the picked suggestion if the input still matches it.
+    const suggestion =
+      pendingSuggestion && pendingSuggestion.name === trimmed ? pendingSuggestion : null;
+    const storeId = suggestion
+      ? suggestion.storeId ?? (selectedStore || null)
+      : selectedStore || null;
+    onAdd(trimmed, storeId, suggestion?.template ?? null);
     setValue('');
+    setPendingSuggestion(null);
     setIsDropdownOpen(false);
     setHighlightedIndex(-1);
   };
 
   const handleInputChange = (e) => {
     setValue(e.target.value);
+    setPendingSuggestion(null);
     setIsDropdownOpen(true);
     setHighlightedIndex(-1);
   };
@@ -125,16 +151,19 @@ export const AddItemForm = ({ stores = [], history = [], listType = 'grocery', o
         />
         {showDropdown && (
           <ul className={styles.dropdown} ref={listRef} role="listbox">
-            {suggestions.map((name, index) => (
+            {suggestions.map((suggestion, index) => (
               <li
-                key={name}
+                key={suggestion.key}
                 role="option"
                 aria-selected={index === highlightedIndex}
                 className={`${styles.dropdownItem} ${index === highlightedIndex ? styles.highlighted : ''}`}
-                onMouseDown={() => handleSelect(name)}
+                onMouseDown={() => handleSelect(suggestion)}
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
-                {name}
+                <span>{suggestion.name}</span>
+                {suggestion.storeName && (
+                  <span className={styles.storeLabel}>{suggestion.storeName}</span>
+                )}
               </li>
             ))}
           </ul>
