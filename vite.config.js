@@ -58,6 +58,8 @@ const previewProdRoutes = {
 }
 
 export default defineConfig({
+  // PORT lets a launcher assign a free port; vite ignores the env var natively.
+  server: { port: Number(process.env.PORT) || 5173 },
   plugins: [
     react(),
     devProdRoutes,
