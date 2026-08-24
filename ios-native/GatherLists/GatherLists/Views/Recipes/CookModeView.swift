@@ -155,6 +155,7 @@ struct CookModeView: View {
             VStack(spacing: 10) {
                 ProgressView(value: Double(completedCount), total: Double(steps.count))
                     .tint(.green)
+                    .animation(.easeInOut(duration: 0.35), value: completedCount)
                 Text("Step \(currentStepIndex + 1) of \(steps.count)")
                     .font(.subheadline)
                     .fontWeight(.medium)
