@@ -755,6 +755,7 @@ export const App = () => {
               <div className={styles.mobileFullScreen}>
                 <MobileRecipeDetail
                   recipe={detailRecipe}
+                  userId={user.id}
                   isOwner={detailRecipe.ownerId === user.id}
                   canEdit={canEditRecipe(detailRecipe)}
                   collectionName={recipeState.collections?.find((c) => c.id === recipeState.activeCollectionId)?.name}
@@ -978,6 +979,7 @@ export const App = () => {
             <div className={styles.recipeCard}>
               <MobileRecipeDetail
                 recipe={recipeState.activeRecipe}
+                userId={user.id}
                 isOwner={recipeState.activeRecipe.ownerId === user.id}
                 canEdit={canEditRecipe(recipeState.activeRecipe)}
                 collectionName={recipeState.collections?.find((c) => c.id === recipeState.activeCollectionId)?.name}

@@ -1,6 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ConfirmDialog } from './ConfirmDialog.jsx';
+import { CookMode } from './CookMode.jsx';
+import {
+  startCookSession,
+  fetchActiveCookSession,
+  fetchCookHistory,
+  setCookStepCompleted,
+  updateCookCurrentStep,
+  completeCookSession,
+  cancelCookSession,
+} from '../services/cookSessionDatabase.js';
 import { useIsMobile } from '../hooks/useIsMobile.js';
 import styles from './MobileRecipeDetail.module.css';
 
@@ -11,6 +21,7 @@ import styles from './MobileRecipeDetail.module.css';
  */
 export const MobileRecipeDetail = ({
   recipe,
+  userId,
   isOwner,
   canEdit,
   collectionName,
@@ -29,8 +40,35 @@ export const MobileRecipeDetail = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [showMovePicker, setShowMovePicker] = useState(false);
+  const [activeCookSession, setActiveCookSession] = useState(null);
+  const [activeCookSteps, setActiveCookSteps] = useState([]);
+  const [cookHistory, setCookHistory] = useState([]);
+  const [showCookMode, setShowCookMode] = useState(false);
   const menuRef = useRef(null);
   const isMobile = useIsMobile();
+
+  const loadCookState = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const [active, history] = await Promise.all([
+        fetchActiveCookSession(recipe.id, userId),
+        fetchCookHistory(recipe.id),
+      ]);
+      setActiveCookSession(active?.session ?? null);
+      setActiveCookSteps(active?.steps ?? []);
+      setCookHistory(history);
+    } catch (err) {
+      console.error('Failed to load cook state:', err);
+    }
+  }, [recipe.id, userId]);
+
+  useEffect(() => {
+    // Defer so the effect body itself schedules no synchronous state updates.
+    const timer = setTimeout(() => {
+      loadCookState();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [loadCookState]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -68,6 +106,78 @@ export const MobileRecipeDetail = ({
   const sortedSteps = [...(recipe.steps ?? [])].sort(
     (a, b) => a.sortOrder - b.sortOrder
   );
+
+  const handleStartCooking = async () => {
+    if (activeCookSession) {
+      setShowCookMode(true);
+      return;
+    }
+    try {
+      const started = await startCookSession(recipe.id, userId, sortedSteps);
+      setActiveCookSession(started.session);
+      setActiveCookSteps(started.steps);
+      setShowCookMode(true);
+    } catch (err) {
+      console.error('Failed to start cook:', err);
+    }
+  };
+
+  const handleCookStepCompleted = (stepId, completed) => {
+    setActiveCookSteps((prev) =>
+      prev.map((step) =>
+        step.id === stepId
+          ? { ...step, completedAt: completed ? new Date().toISOString() : null }
+          : step
+      )
+    );
+    setCookStepCompleted(stepId, completed).catch((err) => {
+      console.error('Failed to update cook step:', err);
+    });
+  };
+
+  const handleCookCurrentStep = (index) => {
+    setActiveCookSession((prev) =>
+      prev ? { ...prev, currentStep: index } : prev
+    );
+    updateCookCurrentStep(activeCookSession.id, index).catch((err) => {
+      console.error('Failed to save current step:', err);
+    });
+  };
+
+  const handleFinishCook = async () => {
+    try {
+      await completeCookSession(activeCookSession.id);
+      setActiveCookSession(null);
+      setActiveCookSteps([]);
+      setShowCookMode(false);
+      await loadCookState();
+    } catch (err) {
+      console.error('Failed to finish cook:', err);
+    }
+  };
+
+  const handleDiscardCook = async () => {
+    try {
+      await cancelCookSession(activeCookSession.id);
+      setActiveCookSession(null);
+      setActiveCookSteps([]);
+      setShowCookMode(false);
+    } catch (err) {
+      console.error('Failed to discard cook:', err);
+    }
+  };
+
+  const formatCookDuration = (session) => {
+    const end = session.completedAt ?? session.startedAt;
+    const minutes = Math.floor(
+      (new Date(end) - new Date(session.startedAt)) / 60000
+    );
+    if (minutes < 1) return 'Under a minute';
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    return remainder === 0 ? `${hours} hr` : `${hours} hr ${remainder} min`;
+  };
 
   const renderHeroImage = () => {
     if (recipe.imageUrl) {
@@ -284,6 +394,16 @@ export const MobileRecipeDetail = ({
           <p className={styles.description}>{recipe.description}</p>
         )}
 
+        {userId && (
+          <button
+            type="button"
+            className={`${styles.cookButton} ${activeCookSession ? styles.cookButtonResume : ''}`}
+            onClick={handleStartCooking}
+          >
+            {activeCookSession ? '↻ Continue Cooking' : '🍳 Start Cooking'}
+          </button>
+        )}
+
         <div className={styles.section}>
           <h2 className={styles.sectionHeader}>INGREDIENTS</h2>
           <div className={styles.ingredientsList}>
@@ -336,6 +456,33 @@ export const MobileRecipeDetail = ({
             ))}
           </div>
         </div>
+
+        {cookHistory.length > 0 && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionHeader}>
+              COOK HISTORY ({cookHistory.length})
+            </h2>
+            <div className={styles.cookHistoryList}>
+              {cookHistory.map((session) => (
+                <div key={session.id} className={styles.cookHistoryRow}>
+                  <span className={styles.cookHistoryCheck}>✓</span>
+                  <span className={styles.cookHistoryText}>
+                    <span className={styles.cookHistoryDate}>
+                      {new Date(session.completedAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </span>
+                    <span className={styles.cookHistoryDuration}>
+                      {formatCookDuration(session)}
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {showMovePicker && (
@@ -387,6 +534,22 @@ export const MobileRecipeDetail = ({
           onCancel={() => setConfirmingDelete(false)}
         />
       )}
+
+      {showCookMode && activeCookSession && (
+        <CookMode
+          recipe={recipe}
+          session={activeCookSession}
+          steps={activeCookSteps}
+          onSetStepCompleted={handleCookStepCompleted}
+          onSetCurrentStep={handleCookCurrentStep}
+          onFinish={handleFinishCook}
+          onDiscard={handleDiscardCook}
+          onClose={() => {
+            setShowCookMode(false);
+            loadCookState();
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -418,6 +581,7 @@ MobileRecipeDetail.propTypes = {
       })
     ),
   }).isRequired,
+  userId: PropTypes.string,
   isOwner: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool,
   collectionName: PropTypes.string,

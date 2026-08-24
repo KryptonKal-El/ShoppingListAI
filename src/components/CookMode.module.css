@@ -1,0 +1,222 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+}
+
+.navBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.navTitle {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.closeButton {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+}
+
+.discardButton {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 8px;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.phaseTitle {
+  margin: 0 0 16px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ingredientList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ingredientRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.ingredientRow:hover {
+  background: var(--bg-hover);
+}
+
+.ingredientCheckbox {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ingredientText {
+  display: flex;
+  flex-direction: column;
+}
+
+.ingredientName {
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.ingredientQuantity {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.ingredientGathered .ingredientName {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.progressWrap {
+  padding: 14px 20px 0;
+}
+
+.progressTrack {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-light);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--primary);
+  transition: width 0.25s ease;
+}
+
+.progressLabel {
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.stepDoneBadge {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.stepInstruction {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.finishArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.finishBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 36px;
+}
+
+.finishTitle {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.finishSubtitle {
+  margin: 0;
+  font-size: 17px;
+  color: var(--text-secondary);
+}
+
+.bottomBar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+}
+
+.primaryButton {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.primaryButton:hover {
+  filter: brightness(1.05);
+}
+
+.backStepButton {
+  border: none;
+  border-radius: 14px;
+  padding: 16px 22px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  cursor: pointer;
+}

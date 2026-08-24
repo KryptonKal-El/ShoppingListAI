@@ -509,3 +509,66 @@
     font-size: 0.9rem;
   }
 }
+
+.cookButton {
+  display: block;
+  width: calc(100% - 2rem);
+  margin: 1rem auto 0;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.cookButton:hover {
+  filter: brightness(1.05);
+}
+
+.cookButtonResume {
+  background: #e8862d;
+}
+
+.cookHistoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cookHistoryRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.5rem 0;
+}
+
+.cookHistoryCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.cookHistoryText {
+  display: flex;
+  flex-direction: column;
+}
+
+.cookHistoryDate {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.cookHistoryDuration {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
