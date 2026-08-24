@@ -17,7 +17,9 @@ struct RecipeDetailView: View {
     @State private var addAllToList = false
     @State private var editIngredients: [RecipeIngredient] = []
     @State private var editSteps: [RecipeStep] = []
-    
+    @State private var cookViewModel: CookSessionViewModel?
+    @State private var showCookMode = false
+
     var body: some View {
         Group {
             if viewModel.activeRecipeDetail == nil {
@@ -107,8 +109,25 @@ struct RecipeDetailView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .fullScreenCover(isPresented: $showCookMode, onDismiss: {
+            Task { await cookViewModel?.loadState() }
+        }) {
+            if let cookViewModel {
+                CookModeView(
+                    recipe: recipe,
+                    ingredients: viewModel.activeRecipeDetail?.ingredients ?? [],
+                    cookViewModel: cookViewModel
+                )
+            }
+        }
         .onAppear {
-            Task { await viewModel.selectRecipe(id: recipe.id) }
+            if cookViewModel == nil {
+                cookViewModel = CookSessionViewModel(recipeId: recipe.id, userId: userId)
+            }
+            Task {
+                await viewModel.selectRecipe(id: recipe.id)
+                await cookViewModel?.loadState()
+            }
         }
     }
     
@@ -138,11 +157,91 @@ struct RecipeDetailView: View {
                         .foregroundStyle(.secondary)
                 }
                 
+                startCookingButton
                 ingredientsSection
                 stepsSection
+                cookHistorySection
             }
             .padding()
         }
+    }
+
+    @ViewBuilder
+    private var startCookingButton: some View {
+        let hasActiveCook = cookViewModel?.activeSession != nil
+
+        Button {
+            if hasActiveCook {
+                showCookMode = true
+            } else {
+                Task {
+                    let steps = viewModel.activeRecipeDetail?.steps ?? []
+                    if await cookViewModel?.startCook(steps: steps) == true {
+                        showCookMode = true
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: hasActiveCook ? "arrow.clockwise" : "frying.pan")
+                Text(hasActiveCook ? "Continue Cooking" : "Start Cooking")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(hasActiveCook ? Color.orange : Color.accentColor)
+            .foregroundStyle(.white)
+            .fontWeight(.semibold)
+            .cornerRadius(12)
+        }
+    }
+
+    @ViewBuilder
+    private var cookHistorySection: some View {
+        let history = cookViewModel?.history ?? []
+
+        if !history.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Cook History")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("\(history.count)")
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color(.systemGray5))
+                        .clipShape(Capsule())
+                }
+
+                ForEach(history) { session in
+                    HStack(spacing: 12) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.title3)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(session.completedAt ?? session.startedAt, style: .date)
+                                .font(.body)
+                            Text(historyDuration(session))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text(session.completedAt ?? session.startedAt, style: .relative)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    private func historyDuration(_ session: CookSession) -> String {
+        let minutes = Int(session.duration / 60)
+        if minutes < 1 { return "Under a minute" }
+        if minutes < 60 { return "\(minutes) min" }
+        let hours = minutes / 60
+        let remainder = minutes % 60
+        return remainder == 0 ? "\(hours) hr" : "\(hours) hr \(remainder) min"
     }
     
     @ViewBuilder

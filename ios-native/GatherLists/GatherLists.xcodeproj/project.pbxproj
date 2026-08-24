@@ -39,15 +39,19 @@
 		A1B2C3D4E5F6A7B8C9D0E268 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E267 /* Recipe.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E26A /* RecipeIngredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E26C /* RecipeStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */; };
+		COOKSESSMODEL00000000002 /* CookSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKSESSMODEL00000000001 /* CookSession.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E26E /* RecipeCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E270 /* CollectionShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E272 /* RecipeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */; };
+		COOKSESSSVC0000000000002 /* CookSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKSESSSVC0000000000001 /* CookSessionService.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E274 /* RecipeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E273 /* RecipeViewModel.swift */; };
+		COOKSESSVM00000000000002 /* CookSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKSESSVM00000000000001 /* CookSessionViewModel.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E276 /* CollectionBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E275 /* CollectionBrowserView.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E278 /* CreateCollectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E277 /* CreateCollectionSheet.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E27C /* RecipeFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E27B /* RecipeFormSheet.swift */; };
 		RECIPEIMPORTVIEW00000002 /* RecipeImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RECIPEIMPORTVIEW00000001 /* RecipeImportView.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E27E /* RecipeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E27D /* RecipeDetailView.swift */; };
+		COOKMODEVIEW000000000002 /* CookModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKMODEVIEW000000000001 /* CookModeView.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E280 /* ShareCollectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E27F /* ShareCollectionSheet.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E282 /* EditCollectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E281 /* EditCollectionSheet.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E284 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E283 /* StorageService.swift */; };
@@ -210,15 +214,19 @@
 		A1B2C3D4E5F6A7B8C9D0E267 /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeIngredient.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeStep.swift; sourceTree = "<group>"; };
+		COOKSESSMODEL00000000001 /* CookSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookSession.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCollection.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionShare.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeService.swift; sourceTree = "<group>"; };
+		COOKSESSSVC0000000000001 /* CookSessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookSessionService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E273 /* RecipeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeViewModel.swift; sourceTree = "<group>"; };
+		COOKSESSVM00000000000001 /* CookSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookSessionViewModel.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E275 /* CollectionBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBrowserView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E277 /* CreateCollectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCollectionSheet.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E27B /* RecipeFormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeFormSheet.swift; sourceTree = "<group>"; };
 		RECIPEIMPORTVIEW00000001 /* RecipeImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeImportView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E27D /* RecipeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailView.swift; sourceTree = "<group>"; };
+		COOKMODEVIEW000000000001 /* CookModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookModeView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E27F /* ShareCollectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCollectionSheet.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E281 /* EditCollectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCollectionSheet.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E283 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
@@ -407,6 +415,7 @@
 				A1B2C3D4E5F6A7B8C9D0E267 /* Recipe.swift */,
 				A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */,
+				COOKSESSMODEL00000000001 /* CookSession.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */,
 				A1B2C3D4E5F6A7B8C9D0E296 /* Profile.swift */,
@@ -426,6 +435,7 @@
 				A1B2C3D4E5F6A7B8C9D0E254 /* HistoryService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E256 /* StoreService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */,
+				COOKSESSSVC0000000000001 /* CookSessionService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E283 /* StorageService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E298 /* ProfileService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E29C /* ProductSearchService.swift */,
@@ -450,6 +460,7 @@
 				A1B2C3D4E5F6A7B8C9D0E258 /* ListDetailViewModel.swift */,
 				A1B2C3D4E5F6A7B8C9D0E25A /* StoreViewModel.swift */,
 				A1B2C3D4E5F6A7B8C9D0E273 /* RecipeViewModel.swift */,
+				COOKSESSVM00000000000001 /* CookSessionViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -504,6 +515,7 @@
 				A1B2C3D4E5F6A7B8C9D0E27B /* RecipeFormSheet.swift */,
 				RECIPEIMPORTVIEW00000001 /* RecipeImportView.swift */,
 				A1B2C3D4E5F6A7B8C9D0E27D /* RecipeDetailView.swift */,
+				COOKMODEVIEW000000000001 /* CookModeView.swift */,
 				A1B2C3D4E5F6A7B8C9D0E27F /* ShareCollectionSheet.swift */,
 				A1B2C3D4E5F6A7B8C9D0E281 /* EditCollectionSheet.swift */,
 				A1B2C3D4E5F6A7B8C9D0E292 /* AddToListSheet.swift */,
@@ -844,15 +856,19 @@
 				A1B2C3D4E5F6A7B8C9D0E268 /* Recipe.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E26A /* RecipeIngredient.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E26C /* RecipeStep.swift in Sources */,
+				COOKSESSMODEL00000000002 /* CookSession.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E26E /* RecipeCollection.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E270 /* CollectionShare.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E272 /* RecipeService.swift in Sources */,
+				COOKSESSSVC0000000000002 /* CookSessionService.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E274 /* RecipeViewModel.swift in Sources */,
+				COOKSESSVM00000000000002 /* CookSessionViewModel.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E276 /* CollectionBrowserView.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E278 /* CreateCollectionSheet.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E27C /* RecipeFormSheet.swift in Sources */,
 				RECIPEIMPORTVIEW00000002 /* RecipeImportView.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E27E /* RecipeDetailView.swift in Sources */,
+				COOKMODEVIEW000000000002 /* CookModeView.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E280 /* ShareCollectionSheet.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E282 /* EditCollectionSheet.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E284 /* StorageService.swift in Sources */,
