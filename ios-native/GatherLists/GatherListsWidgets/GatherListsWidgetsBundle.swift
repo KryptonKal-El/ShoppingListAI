@@ -10,5 +10,6 @@ struct GatherListsWidgetsBundle: WidgetBundle {
         QuickAddWidget()
         ItemCountLockScreenWidget()
         NextDueLockScreenWidget()
+        CookActivityWidget()
     }
 }

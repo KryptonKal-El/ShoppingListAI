@@ -122,7 +122,7 @@ struct RecipeDetailView: View {
         }
         .onAppear {
             if cookViewModel == nil {
-                cookViewModel = CookSessionViewModel(recipeId: recipe.id, userId: userId)
+                cookViewModel = CookSessionViewModel(recipeId: recipe.id, recipeName: recipe.name, userId: userId)
             }
             Task {
                 await viewModel.selectRecipe(id: recipe.id)

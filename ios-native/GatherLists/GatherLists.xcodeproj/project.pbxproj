@@ -40,6 +40,10 @@
 		A1B2C3D4E5F6A7B8C9D0E26A /* RecipeIngredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E26C /* RecipeStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */; };
 		COOKSESSMODEL00000000002 /* CookSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKSESSMODEL00000000001 /* CookSession.swift */; };
+		COOKATTR0000000000000002 /* CookActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKATTR0000000000000001 /* CookActivityAttributes.swift */; };
+		COOKATTR0000000000000003 /* CookActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKATTR0000000000000001 /* CookActivityAttributes.swift */; };
+		COOKACTCTRL0000000000002 /* CookActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKACTCTRL0000000000001 /* CookActivityController.swift */; };
+		COOKACTWIDGET00000000002 /* CookActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = COOKACTWIDGET00000000001 /* CookActivityWidget.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E26E /* RecipeCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E270 /* CollectionShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E272 /* RecipeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */; };
@@ -215,6 +219,9 @@
 		A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeIngredient.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeStep.swift; sourceTree = "<group>"; };
 		COOKSESSMODEL00000000001 /* CookSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookSession.swift; sourceTree = "<group>"; };
+		COOKATTR0000000000000001 /* CookActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookActivityAttributes.swift; sourceTree = "<group>"; };
+		COOKACTCTRL0000000000001 /* CookActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookActivityController.swift; sourceTree = "<group>"; };
+		COOKACTWIDGET00000000001 /* CookActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookActivityWidget.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCollection.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionShare.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeService.swift; sourceTree = "<group>"; };
@@ -416,6 +423,7 @@
 				A1B2C3D4E5F6A7B8C9D0E269 /* RecipeIngredient.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26B /* RecipeStep.swift */,
 				COOKSESSMODEL00000000001 /* CookSession.swift */,
+				COOKATTR0000000000000001 /* CookActivityAttributes.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26D /* RecipeCollection.swift */,
 				A1B2C3D4E5F6A7B8C9D0E26F /* CollectionShare.swift */,
 				A1B2C3D4E5F6A7B8C9D0E296 /* Profile.swift */,
@@ -436,6 +444,7 @@
 				A1B2C3D4E5F6A7B8C9D0E256 /* StoreService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E271 /* RecipeService.swift */,
 				COOKSESSSVC0000000000001 /* CookSessionService.swift */,
+				COOKACTCTRL0000000000001 /* CookActivityController.swift */,
 				A1B2C3D4E5F6A7B8C9D0E283 /* StorageService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E298 /* ProfileService.swift */,
 				A1B2C3D4E5F6A7B8C9D0E29C /* ProductSearchService.swift */,
@@ -636,6 +645,7 @@
 			isa = PBXGroup;
 			children = (
 				ITEMCOUNTLOCKSCREEN00001 /* ItemCountLockScreenWidget.swift */,
+				COOKACTWIDGET00000000001 /* CookActivityWidget.swift */,
 				NEXTDUELOCKSCREEN000001 /* NextDueLockScreenWidget.swift */,
 			);
 			path = LockScreen;
@@ -861,6 +871,8 @@
 				A1B2C3D4E5F6A7B8C9D0E270 /* CollectionShare.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E272 /* RecipeService.swift in Sources */,
 				COOKSESSSVC0000000000002 /* CookSessionService.swift in Sources */,
+				COOKATTR0000000000000002 /* CookActivityAttributes.swift in Sources */,
+				COOKACTCTRL0000000000002 /* CookActivityController.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E274 /* RecipeViewModel.swift in Sources */,
 				COOKSESSVM00000000000002 /* CookSessionViewModel.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E276 /* CollectionBrowserView.swift in Sources */,
@@ -950,6 +962,8 @@
 				QUICKADDMEDIUM0000000002 /* QuickAddMedium.swift in Sources */,
 				QUICKADDLARGE00000000002 /* QuickAddLarge.swift in Sources */,
 				ITEMCOUNTLOCKSCREEN00002 /* ItemCountLockScreenWidget.swift in Sources */,
+				COOKACTWIDGET00000000002 /* CookActivityWidget.swift in Sources */,
+				COOKATTR0000000000000003 /* CookActivityAttributes.swift in Sources */,
 				NEXTDUELOCKSCREEN000002 /* NextDueLockScreenWidget.swift in Sources */,
 				STRINGEMOJI0000000000003 /* String+Emoji.swift in Sources */,
 			);

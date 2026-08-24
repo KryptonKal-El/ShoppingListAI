@@ -7,6 +7,7 @@ import Observation
 @MainActor
 final class CookSessionViewModel {
     let recipeId: UUID
+    let recipeName: String
     let userId: UUID
 
     var activeSession: CookSession?
@@ -14,12 +15,15 @@ final class CookSessionViewModel {
     var history: [CookSession] = []
     var error: String?
 
-    init(recipeId: UUID, userId: UUID) {
+    init(recipeId: UUID, recipeName: String, userId: UUID) {
         self.recipeId = recipeId
+        self.recipeName = recipeName
         self.userId = userId
     }
 
-    /// Loads the in-progress session (if any) and the completed history.
+    /// Loads the in-progress session (if any) and the completed history, and
+    /// reconciles the Live Activity: revive it for an in-progress cook, end it
+    /// when none exists.
     func loadState() async {
         do {
             async let active = CookSessionService.fetchActiveSession(recipeId: recipeId, userId: userId)
@@ -28,10 +32,30 @@ final class CookSessionViewModel {
             activeSession = activeResult?.session
             activeSteps = activeResult?.steps ?? []
             history = historyResult
+            if let session = activeSession {
+                await CookActivityController.shared.start(
+                    recipeId: recipeId,
+                    recipeName: recipeName,
+                    startedAt: session.startedAt,
+                    state: activityState()
+                )
+            } else {
+                await CookActivityController.shared.endAll()
+            }
         } catch {
             self.error = error.localizedDescription
             print("[CookSessionViewModel] Failed to load cook state: \(error.localizedDescription)")
         }
+    }
+
+    private func activityState() -> CookActivityAttributes.ContentState {
+        let index = min(activeSession?.currentStep ?? 0, max(activeSteps.count - 1, 0))
+        return CookActivityAttributes.ContentState(
+            currentStep: activeSteps.isEmpty ? 0 : index + 1,
+            totalSteps: activeSteps.count,
+            instruction: activeSteps.isEmpty ? "Let's cook!" : activeSteps[index].instruction,
+            completedSteps: activeSteps.filter { $0.completedAt != nil }.count
+        )
     }
 
     /// Starts a new cook, snapshotting the recipe's current steps.
@@ -46,6 +70,12 @@ final class CookSessionViewModel {
             )
             activeSession = started.session
             activeSteps = started.steps
+            await CookActivityController.shared.start(
+                recipeId: recipeId,
+                recipeName: recipeName,
+                startedAt: started.session.startedAt,
+                state: activityState()
+            )
             return true
         } catch {
             self.error = error.localizedDescription
@@ -59,6 +89,7 @@ final class CookSessionViewModel {
         guard let index = activeSteps.firstIndex(where: { $0.id == step.id }) else { return }
         let previous = activeSteps[index].completedAt
         activeSteps[index].completedAt = completed ? Date() : nil
+        await CookActivityController.shared.update(state: activityState())
         do {
             try await CookSessionService.setStepCompleted(stepId: step.id, completed: completed)
         } catch {
@@ -73,6 +104,7 @@ final class CookSessionViewModel {
         guard var session = activeSession, session.currentStep != index else { return }
         session.currentStep = index
         activeSession = session
+        await CookActivityController.shared.update(state: activityState())
         do {
             try await CookSessionService.updateCurrentStep(sessionId: session.id, currentStep: index)
         } catch {
@@ -88,6 +120,7 @@ final class CookSessionViewModel {
             try await CookSessionService.completeSession(sessionId: session.id)
             activeSession = nil
             activeSteps = []
+            await CookActivityController.shared.endAll()
             await loadState()
         } catch {
             self.error = error.localizedDescription
@@ -103,6 +136,7 @@ final class CookSessionViewModel {
             try await CookSessionService.cancelSession(sessionId: session.id)
             activeSession = nil
             activeSteps = []
+            await CookActivityController.shared.endAll()
         } catch {
             self.error = error.localizedDescription
             print("[CookSessionViewModel] Failed to cancel cook: \(error.localizedDescription)")
