@@ -572,3 +572,98 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
+
+.cookHistorySummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 2rem);
+  margin: 0 auto 1rem;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg-hover);
+  cursor: pointer;
+  text-align: left;
+}
+
+.cookHistoryChevron {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.cookHistoryBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: var(--overlay-dark, rgba(0, 0, 0, 0.4));
+}
+
+.cookHistoryPanel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1101;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-radius: 16px 16px 0 0;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 24px var(--overlay-light);
+  animation: cookHistorySlideUp 0.25s ease-out;
+}
+
+@keyframes cookHistorySlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.cookHistoryPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.cookHistoryPanelTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cookHistoryPanelClose {
+  border: none;
+  background: none;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.cookHistoryList {
+  overflow-y: auto;
+}
+
+.cookHistoryRelative {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 701px) {
+  .cookHistoryPanel {
+    left: 50%;
+    right: auto;
+    bottom: 0;
+    width: 480px;
+    transform: translateX(-50%);
+  }
+}

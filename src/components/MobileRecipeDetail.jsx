@@ -44,6 +44,8 @@ export const MobileRecipeDetail = ({
   const [activeCookSteps, setActiveCookSteps] = useState([]);
   const [cookHistory, setCookHistory] = useState([]);
   const [showCookMode, setShowCookMode] = useState(false);
+  const [showCookHistoryPanel, setShowCookHistoryPanel] = useState(false);
+  const [historyLoadedAt, setHistoryLoadedAt] = useState(null);
   const menuRef = useRef(null);
   const isMobile = useIsMobile();
 
@@ -57,6 +59,7 @@ export const MobileRecipeDetail = ({
       setActiveCookSession(active?.session ?? null);
       setActiveCookSteps(active?.steps ?? []);
       setCookHistory(history);
+      setHistoryLoadedAt(Date.now());
     } catch (err) {
       console.error('Failed to load cook state:', err);
     }
@@ -177,6 +180,17 @@ export const MobileRecipeDetail = ({
     const hours = Math.floor(minutes / 60);
     const remainder = minutes % 60;
     return remainder === 0 ? `${hours} hr` : `${hours} hr ${remainder} min`;
+  };
+
+  const formatLastCooked = (session) => {
+    const days = Math.floor(
+      ((historyLoadedAt ?? 0) - new Date(session.completedAt)) / 86400000
+    );
+    if (days < 1) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 30) return `${days} days ago`;
+    const months = Math.floor(days / 30);
+    return months === 1 ? 'a month ago' : `${months} months ago`;
   };
 
   const renderHeroImage = () => {
@@ -458,10 +472,45 @@ export const MobileRecipeDetail = ({
         </div>
 
         {cookHistory.length > 0 && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionHeader}>
-              COOK HISTORY ({cookHistory.length})
-            </h2>
+          <button
+            type="button"
+            className={styles.cookHistorySummary}
+            onClick={() => setShowCookHistoryPanel(true)}
+          >
+            <span className={styles.cookHistoryCheck}>✓</span>
+            <span className={styles.cookHistoryText}>
+              <span className={styles.cookHistoryDate}>
+                {cookHistory.length === 1
+                  ? 'Cooked once'
+                  : `Cooked ${cookHistory.length} times`}
+              </span>
+              <span className={styles.cookHistoryDuration}>
+                Last cooked {formatLastCooked(cookHistory[0])}
+              </span>
+            </span>
+            <span className={styles.cookHistoryChevron}>›</span>
+          </button>
+        )}
+      </div>
+
+      {showCookHistoryPanel && (
+        <>
+          <div
+            className={styles.cookHistoryBackdrop}
+            onClick={() => setShowCookHistoryPanel(false)}
+          />
+          <div className={styles.cookHistoryPanel}>
+            <div className={styles.cookHistoryPanelHeader}>
+              <h3 className={styles.cookHistoryPanelTitle}>Cook History</h3>
+              <button
+                type="button"
+                className={styles.cookHistoryPanelClose}
+                onClick={() => setShowCookHistoryPanel(false)}
+                aria-label="Close cook history"
+              >
+                ✕
+              </button>
+            </div>
             <div className={styles.cookHistoryList}>
               {cookHistory.map((session) => (
                 <div key={session.id} className={styles.cookHistoryRow}>
@@ -478,12 +527,15 @@ export const MobileRecipeDetail = ({
                       {formatCookDuration(session)}
                     </span>
                   </span>
+                  <span className={styles.cookHistoryRelative}>
+                    {formatLastCooked(session)}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {showMovePicker && (
         <>

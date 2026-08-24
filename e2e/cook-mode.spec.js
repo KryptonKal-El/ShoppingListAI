@@ -126,9 +126,18 @@ test.describe.serial('Cook mode', () => {
     await expect(page.getByText('Nice cooking!')).toBeVisible({ timeout: 5000 });
     await page.getByRole('button', { name: 'Finish Cooking' }).click();
 
-    // Back on the detail: fresh-start button restored, history section present
+    // Back on the detail: fresh-start button restored, compact summary row
+    // present; clicking it slides up the full Cook History panel
     await expect(page.getByRole('button', { name: /Start Cooking/ })).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('COOK HISTORY (1)')).toBeVisible({ timeout: 5000 });
+    const summary = page.getByRole('button', { name: /Cooked once/ });
+    await expect(summary).toBeVisible({ timeout: 5000 });
+    await summary.click();
+
+    await expect(page.getByRole('heading', { name: 'Cook History' })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Under a minute').first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Close cook history' }).click();
+    await expect(page.getByRole('heading', { name: 'Cook History' })).not.toBeVisible({ timeout: 5000 });
   });
 
   test('deletes the scratch recipe and collection', async () => {
