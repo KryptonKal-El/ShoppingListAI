@@ -381,7 +381,7 @@ struct CollectionBrowserView: View {
             Menu {
                 collectionMenuItems(collection)
             } label: {
-                Image(systemName: "ellipsis.circle")
+                Image(systemName: "ellipsis")
                     .font(.body)
                     .foregroundStyle(Color.brandGreen)
                     .frame(width: 28, height: 28)

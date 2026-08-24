@@ -19,6 +19,7 @@ struct RecipeDetailView: View {
     @State private var editSteps: [RecipeStep] = []
     @State private var cookViewModel: CookSessionViewModel?
     @State private var showCookMode = false
+    @State private var showCookHistorySheet = false
 
     var body: some View {
         Group {
@@ -73,7 +74,7 @@ struct RecipeDetailView: View {
                         }
                     }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Image(systemName: "ellipsis")
                 }
             }
         }
@@ -108,6 +109,9 @@ struct RecipeDetailView: View {
                 }
             }
             Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showCookHistorySheet) {
+            cookHistorySheet
         }
         .fullScreenCover(isPresented: $showCookMode, onDismiss: {
             Task { await cookViewModel?.loadState() }
@@ -200,39 +204,73 @@ struct RecipeDetailView: View {
         let history = cookViewModel?.history ?? []
 
         if !history.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Cook History")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text("\(history.count)")
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color(.systemGray5))
-                        .clipShape(Capsule())
-                }
-
-                ForEach(history) { session in
-                    HStack(spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .font(.title3)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(session.completedAt ?? session.startedAt, style: .date)
-                                .font(.body)
-                            Text(historyDuration(session))
+            Button {
+                showCookHistorySheet = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.title3)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(history.count == 1 ? "Cooked once" : "Cooked \(history.count) times")
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.primary)
+                        if let lastCooked = history.first?.completedAt {
+                            Text("Last cooked \(lastCooked.formatted(.relative(presentation: .named)))")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        Spacer()
-                        Text(session.completedAt ?? session.startedAt, style: .relative)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(14)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @ViewBuilder
+    private var cookHistorySheet: some View {
+        let history = cookViewModel?.history ?? []
+
+        NavigationStack {
+            List(history) { session in
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.title3)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(session.completedAt ?? session.startedAt, style: .date)
+                            .font(.body)
+                        Text(historyDuration(session))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    Text(session.completedAt ?? session.startedAt, style: .relative)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Cook History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { showCookHistorySheet = false }
+                        .fontWeight(.semibold)
                 }
             }
         }
+        // Medium-detent sheets render the translucent glass material on iOS 26;
+        // an explicit background keeps the list readable.
+        .presentationBackground(Color(.systemGroupedBackground))
+        .presentationDetents([.medium, .large])
     }
 
     private func historyDuration(_ session: CookSession) -> String {

@@ -1361,7 +1361,7 @@ struct ListDetailView: View {
               }
               .accessibilityIdentifier("ownerMenu-deleteList")
            } label: {
-               Image(systemName: "ellipsis.circle")
+               Image(systemName: "ellipsis")
                    .font(.subheadline)
                    .foregroundStyle(.white)
                    .accessibilityLabel("List options")
@@ -1445,7 +1445,7 @@ struct ListDetailView: View {
                   .accessibilityIdentifier("collaboratorMenu-manageCategories")
                }
            } label: {
-               Image(systemName: "ellipsis.circle")
+               Image(systemName: "ellipsis")
                    .font(.subheadline)
                    .foregroundStyle(.white)
                    .accessibilityLabel("List options")

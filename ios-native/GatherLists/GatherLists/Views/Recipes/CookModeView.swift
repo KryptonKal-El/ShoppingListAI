@@ -61,7 +61,7 @@ struct CookModeView: View {
                             Label("Discard Cook", systemImage: "trash")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle")
+                        Image(systemName: "ellipsis")
                     }
                 }
             }
