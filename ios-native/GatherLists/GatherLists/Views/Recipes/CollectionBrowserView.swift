@@ -1,9 +1,10 @@
 import SwiftUI
 
-/// Recipes home screen. Collections are shown as collapsible groups with their
-/// recipes nested inline, so recipes are visible without leaving the screen. A
-/// single "+" adds a recipe (via a method chooser) or a collection; each
-/// collection also has its own "+" to add a recipe straight into it.
+/// Recipes home screen. Recipes render as photo cards in a two-column grid;
+/// collections are a horizontal row of filter chips above it. "All" shows every
+/// recipe (each card carries its collection's emoji marker), and selecting a
+/// collection chip filters the grid and shows that collection's header with its
+/// actions. A single "+" adds a recipe (via a method chooser) or a collection.
 struct CollectionBrowserView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @State private var viewModel: RecipeViewModel?
@@ -14,10 +15,11 @@ struct CollectionBrowserView: View {
     @State private var collectionToShare: RecipeCollection?
     @State private var collectionToRename: RecipeCollection?
 
-    // Expansion state
-    @State private var expandedCollectionIds: Set<UUID> = []
-    @State private var didInitExpansion = false
-    @State private var expandedSharedIds: Set<UUID> = []
+    // Chip selection (nil = All). Persisted so a relaunch restores the filter.
+    @State private var selectedCollectionId: UUID?
+    @State private var didInitSelection = false
+
+    // Shared-collection recipes, fetched eagerly so "All" really shows everything.
     @State private var sharedRecipesByCollection: [UUID: [Recipe]] = [:]
     @State private var loadingSharedIds: Set<UUID> = []
 
@@ -28,7 +30,7 @@ struct CollectionBrowserView: View {
     @State private var showImport = false
     @State private var showSearch = false
 
-    // Recipe row actions
+    // Recipe card actions
     @State private var recipeToEdit: Recipe?
     @State private var editIngredients: [RecipeIngredient] = []
     @State private var editSteps: [RecipeStep] = []
@@ -38,45 +40,66 @@ struct CollectionBrowserView: View {
     @State private var recipeToMove: Recipe?
     @State private var showMoveSheet = false
 
-    private static let expandedKey = "gather.recipeExpandedCollections"
+    private static let selectedKey = "gather.recipeSelectedCollection"
 
-    private var ownedFiltered: [RecipeCollection] {
-        guard let vm = viewModel else { return [] }
-        guard !vm.searchQuery.isEmpty else { return vm.collections }
-        let query = vm.searchQuery.lowercased()
-        return vm.collections.filter { collection in
-            collection.name.lowercased().contains(query) ||
-            recipes(in: collection).contains { $0.name.lowercased().contains(query) }
-        }
-    }
-
-    private var sharedFiltered: [RecipeCollection] {
-        guard let vm = viewModel else { return [] }
-        guard !vm.searchQuery.isEmpty else { return vm.sharedCollections }
-        let query = vm.searchQuery.lowercased()
-        return vm.sharedCollections.filter { collection in
-            collection.name.lowercased().contains(query) ||
-            (collection.emoji?.lowercased().contains(query) ?? false)
-        }
-    }
+    private let gridColumns = [
+        GridItem(.flexible(), spacing: 14),
+        GridItem(.flexible(), spacing: 14)
+    ]
 
     private var hasNoCollections: Bool {
         guard let vm = viewModel else { return true }
         return vm.collections.isEmpty && vm.sharedCollections.isEmpty
     }
 
+    private var selectedCollection: RecipeCollection? {
+        guard let id = selectedCollectionId else { return nil }
+        return viewModel?.allCollections.first(where: { $0.id == id })
+    }
+
+    private func isShared(_ collection: RecipeCollection) -> Bool {
+        viewModel?.sharedCollections.contains(where: { $0.id == collection.id }) ?? false
+    }
+
     private func recipes(in collection: RecipeCollection) -> [Recipe] {
-        viewModel?.recipes.filter { $0.collectionId == collection.id } ?? []
+        if isShared(collection) {
+            return sharedRecipesByCollection[collection.id] ?? []
+        }
+        return viewModel?.recipes.filter { $0.collectionId == collection.id } ?? []
     }
 
     private func recipeCount(for collection: RecipeCollection) -> Int {
         recipes(in: collection).count
     }
 
-    /// Recipe count for the header row. Shared collections load their recipes
-    /// lazily, so the count is hidden (nil) until they have been fetched.
-    private func displayedRecipeCount(for collection: RecipeCollection, isShared: Bool) -> Int? {
-        isShared ? sharedRecipesByCollection[collection.id]?.count : recipeCount(for: collection)
+    private func collection(for recipe: Recipe) -> RecipeCollection? {
+        viewModel?.allCollections.first(where: { $0.id == recipe.collectionId })
+    }
+
+    /// `owned` means the recipe's collection is owned by the user; Move stays
+    /// owner-only since it can pull a recipe out of a shared collection.
+    private func isOwned(_ recipe: Recipe) -> Bool {
+        viewModel?.collections.contains(where: { $0.id == recipe.collectionId }) ?? false
+    }
+
+    /// The cards currently in the grid: the selected collection's recipes, or
+    /// every recipe (owned + loaded shared) for "All" — filtered by the search
+    /// query against recipe and collection names.
+    private var displayedRecipes: [Recipe] {
+        guard let vm = viewModel else { return [] }
+        var result: [Recipe]
+        if let selected = selectedCollection {
+            result = recipes(in: selected)
+        } else {
+            let shared = vm.sharedCollections.flatMap { sharedRecipesByCollection[$0.id] ?? [] }
+            result = vm.recipes + shared
+        }
+        let query = vm.searchQuery.lowercased()
+        guard !query.isEmpty else { return result }
+        return result.filter { recipe in
+            recipe.name.lowercased().contains(query) ||
+            (collection(for: recipe)?.name.lowercased().contains(query) ?? false)
+        }
     }
 
     private var defaultCollectionName: String {
@@ -92,7 +115,7 @@ struct CollectionBrowserView: View {
                     } else if hasNoCollections {
                         emptyStateView
                     } else {
-                        listContent(vm: vm)
+                        gridContent(vm: vm)
                     }
                 } else {
                     loadingView
@@ -103,7 +126,7 @@ struct CollectionBrowserView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         Button {
-                            startNewRecipe(into: nil)
+                            startNewRecipe(into: selectedCollectionId)
                         } label: {
                             Label("New Recipe", systemImage: "fork.knife")
                         }
@@ -172,10 +195,10 @@ struct CollectionBrowserView: View {
                 presenting: collectionToDelete
             ) { collection in
                 Button("Move \(recipeCount(for: collection)) recipes to \(defaultCollectionName) and delete") {
-                    Task { await viewModel?.deleteCollection(id: collection.id, deleteRecipes: false) }
+                    Task { await deleteCollection(collection, deleteRecipes: false) }
                 }
                 Button("Delete collection and \(recipeCount(for: collection)) recipes", role: .destructive) {
-                    Task { await viewModel?.deleteCollection(id: collection.id, deleteRecipes: true) }
+                    Task { await deleteCollection(collection, deleteRecipes: true) }
                 }
                 Button("Cancel", role: .cancel) {}
             }
@@ -193,10 +216,14 @@ struct CollectionBrowserView: View {
         }
         .onAppear {
             initializeViewModelIfNeeded()
-            initExpansionIfNeeded()
+            initSelectionIfNeeded()
+        }
+        .onChange(of: viewModel?.sharedCollections.count ?? 0) { _, _ in
+            Task { await loadAllSharedRecipes() }
         }
         .onChange(of: viewModel?.collections.count ?? 0) { _, _ in
-            initExpansionIfNeeded()
+            initSelectionIfNeeded()
+            validateSelection()
         }
         .onChange(of: showImport) { _, isShowing in
             if !isShowing { reloadSharedRecipesIfNeeded(viewModel?.activeCollectionId) }
@@ -206,28 +233,41 @@ struct CollectionBrowserView: View {
         }
     }
 
-    // MARK: - List content
+    // MARK: - Grid content
 
     @ViewBuilder
-    private func listContent(vm: RecipeViewModel) -> some View {
-        List {
-            ForEach(ownedFiltered) { collection in
-                collectionDisclosure(collection)
-            }
+    private func gridContent(vm: RecipeViewModel) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 12) {
+                chipRow(vm: vm)
 
-            ForEach(sharedFiltered) { collection in
-                sharedDisclosure(collection)
-            }
+                if let selected = selectedCollection {
+                    collectionHeaderCard(selected)
+                        .padding(.horizontal, 16)
+                }
 
-            if ownedFiltered.isEmpty && sharedFiltered.isEmpty && !vm.searchQuery.isEmpty {
-                Text("No recipes or collections match your search")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 24)
+                if let selected = selectedCollection, loadingSharedIds.contains(selected.id),
+                   sharedRecipesByCollection[selected.id] == nil {
+                    HStack { Spacer(); ProgressView(); Spacer() }
+                        .padding(.vertical, 32)
+                } else if displayedRecipes.isEmpty {
+                    gridEmptyState(vm: vm)
+                } else {
+                    LazyVGrid(columns: gridColumns, spacing: 14) {
+                        ForEach(displayedRecipes) { recipe in
+                            recipeCardLink(recipe)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                }
             }
+            .padding(.vertical, 8)
         }
-        .listStyle(.insetGrouped)
-        .refreshable { await vm.refresh() }
+        .background(Color(.systemGroupedBackground))
+        .refreshable {
+            await vm.refresh()
+            await loadAllSharedRecipes()
+        }
         .searchable(text: Binding(
             get: { vm.searchQuery },
             set: { vm.searchQuery = $0 }
@@ -237,95 +277,89 @@ struct CollectionBrowserView: View {
                 CachedDataBanner(cachedAt: vm.cachedAt)
             }
         }
-    }
-
-    // MARK: - Owned collection disclosure
-
-    @ViewBuilder
-    private func collectionDisclosure(_ collection: RecipeCollection) -> some View {
-        let collectionRecipes = recipes(in: collection)
-        DisclosureGroup(isExpanded: ownedBinding(collection.id)) {
-            if collectionRecipes.isEmpty {
-                Button {
-                    startNewRecipe(into: collection.id)
-                } label: {
-                    Label("Add a recipe", systemImage: "plus")
-                        .font(.subheadline)
-                }
-            } else {
-                ForEach(collectionRecipes) { recipe in
-                    recipeNavLink(recipe, owned: true)
-                }
-            }
-        } label: {
-            collectionHeader(collection, isShared: false)
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    if !collection.isDefault {
-                        Button(role: .destructive) {
-                            collectionToDelete = collection
-                            showDeleteDialog = true
-                        } label: { Label("Delete", systemImage: "trash") }
-                            .tint(.red)
-                    }
-                }
-                .contextMenu {
-                    Button { collectionToRename = collection } label: { Label("Rename", systemImage: "pencil") }
-                    Button { collectionToShare = collection } label: { Label("Share", systemImage: "person.badge.plus") }
-                    if !collection.isDefault {
-                        Divider()
-                        Button(role: .destructive) {
-                            collectionToDelete = collection
-                            showDeleteDialog = true
-                        } label: { Label("Delete", systemImage: "trash") }
-                    }
-                }
+        .task {
+            await loadAllSharedRecipes()
         }
     }
 
-    // MARK: - Shared collection disclosure
+    // MARK: - Collection chips
 
     @ViewBuilder
-    private func sharedDisclosure(_ collection: RecipeCollection) -> some View {
-        DisclosureGroup(isExpanded: sharedBinding(collection.id)) {
-            let loaded = sharedRecipesByCollection[collection.id]
-            if loaded == nil && loadingSharedIds.contains(collection.id) {
-                HStack { Spacer(); ProgressView(); Spacer() }
-            } else if let loaded, loaded.isEmpty {
-                Button {
-                    startNewRecipe(into: collection.id)
-                } label: {
-                    Label("Add a recipe", systemImage: "plus")
-                        .font(.subheadline)
+    private func chipRow(vm: RecipeViewModel) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                chip(label: "All", emoji: nil, isSelected: selectedCollectionId == nil) {
+                    select(nil)
                 }
-            } else {
-                ForEach(loaded ?? []) { recipe in
-                    recipeNavLink(recipe, owned: false)
+
+                ForEach(vm.allCollections) { collection in
+                    chip(
+                        label: collection.name,
+                        emoji: (collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁",
+                        isSelected: selectedCollectionId == collection.id
+                    ) {
+                        select(collection.id)
+                    }
+                    .contextMenu { collectionMenuItems(collection) }
                 }
             }
-        } label: {
-            collectionHeader(collection, isShared: true)
-                .contextMenu {
-                    Button(role: .destructive) {
-                        Task {
-                            if let email = authViewModel.currentUser?.email {
-                                try? await viewModel?.unshareCollection(id: collection.id, email: email)
-                                viewModel?.sharedCollections.removeAll { $0.id == collection.id }
-                            }
-                        }
-                    } label: { Label("Leave Collection", systemImage: "rectangle.portrait.and.arrow.right") }
-                }
+            .padding(.horizontal, 16)
         }
     }
 
     @ViewBuilder
-    private func collectionHeader(_ collection: RecipeCollection, isShared: Bool) -> some View {
-        HStack(spacing: 12) {
+    private func chip(label: String, emoji: String?, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                if let emoji {
+                    Text(emoji)
+                }
+                Text(label)
+                    .fontWeight(isSelected ? .semibold : .medium)
+            }
+            .font(.subheadline)
+            .lineLimit(1)
+            .padding(.horizontal, 13)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color.brandGreen : Color(.secondarySystemGroupedBackground))
+            .foregroundStyle(isSelected ? .white : .primary)
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func collectionMenuItems(_ collection: RecipeCollection) -> some View {
+        if isShared(collection) {
+            Button(role: .destructive) {
+                leaveCollection(collection)
+            } label: { Label("Leave Collection", systemImage: "rectangle.portrait.and.arrow.right") }
+        } else {
+            Button { collectionToRename = collection } label: { Label("Rename", systemImage: "pencil") }
+            Button { collectionToShare = collection } label: { Label("Share", systemImage: "person.badge.plus") }
+            if !collection.isDefault {
+                Divider()
+                Button(role: .destructive) {
+                    collectionToDelete = collection
+                    showDeleteDialog = true
+                } label: { Label("Delete", systemImage: "trash") }
+            }
+        }
+    }
+
+    // MARK: - Selected collection header
+
+    @ViewBuilder
+    private func collectionHeaderCard(_ collection: RecipeCollection) -> some View {
+        HStack(spacing: 10) {
             Text((collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁")
                 .font(.title3)
             Text(collection.name)
-                .font(.body)
-                .fontWeight(.medium)
+                .font(.headline)
                 .lineLimit(1)
+            Text("\(recipeCount(for: collection))")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             Spacer(minLength: 8)
             if let collaborators = viewModel?.collaboratorsByCollectionId[collection.id], !collaborators.isEmpty {
                 AvatarGroupView(
@@ -333,11 +367,6 @@ struct CollectionBrowserView: View {
                     size: 28,
                     color: Color.brandGreen
                 )
-            }
-            if let count = displayedRecipeCount(for: collection, isShared: isShared) {
-                Text("\(count)")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
             Button {
                 startNewRecipe(into: collection.id)
@@ -349,63 +378,139 @@ struct CollectionBrowserView: View {
             }
             .buttonStyle(.borderless)
             .accessibilityLabel("Add recipe to \(collection.name)")
+            Menu {
+                collectionMenuItems(collection)
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.body)
+                    .foregroundStyle(Color.brandGreen)
+                    .frame(width: 28, height: 28)
+            }
+            .accessibilityLabel("Options for \(collection.name)")
         }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - Recipe row
+    // MARK: - Recipe cards
 
-    /// `owned` means the enclosing collection is owned by the user. Rows in
-    /// shared collections still get Edit and Delete (collaborators have write
-    /// access); Move stays owner-only since it can pull a recipe out of the
-    /// shared collection.
     @ViewBuilder
-    private func recipeNavLink(_ recipe: Recipe, owned: Bool) -> some View {
+    private func recipeCardLink(_ recipe: Recipe) -> some View {
         NavigationLink(value: recipe) {
-            recipeRow(recipe)
+            recipeCard(recipe)
         }
+        .buttonStyle(.plain)
         .contextMenu {
             Button { beginEdit(recipe) } label: { Label("Edit", systemImage: "pencil") }
-            if owned {
+            if isOwned(recipe) {
                 Button { recipeToMove = recipe; showMoveSheet = true } label: { Label("Move to Collection", systemImage: "folder") }
             }
             Divider()
             Button(role: .destructive) { recipeToDelete = recipe; showRecipeDeleteDialog = true } label: { Label("Delete", systemImage: "trash") }
         }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) { recipeToDelete = recipe; showRecipeDeleteDialog = true } label: { Label("Delete", systemImage: "trash") }
-                .tint(.red)
-        }
     }
 
     @ViewBuilder
-    private func recipeRow(_ recipe: Recipe) -> some View {
-        HStack(spacing: 12) {
-            if let imageUrl = recipe.imageUrl, let url = URL(string: imageUrl) {
-                AsyncImage(url: url) { image in
-                    image.resizable().aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Rectangle().fill(Color(.systemGray5))
-                        .overlay { Image(systemName: "photo").foregroundStyle(.secondary) }
+    private func recipeCard(_ recipe: Recipe) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                Group {
+                    if let imageUrl = recipe.imageUrl, let url = URL(string: imageUrl) {
+                        AsyncImage(url: url) { image in
+                            image.resizable().aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            cardImagePlaceholder
+                        }
+                    } else {
+                        cardImagePlaceholder
+                    }
                 }
-                .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.systemGray5))
-                    .frame(width: 44, height: 44)
-                    .overlay { Image(systemName: "fork.knife").foregroundStyle(.secondary) }
+                .frame(height: 104)
+                .frame(maxWidth: .infinity)
+                .clipped()
+
+                // Collection marker, shown in the "All" view where the grid mixes collections.
+                if selectedCollectionId == nil, let collection = collection(for: recipe) {
+                    Text((collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁")
+                        .font(.caption)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(.thinMaterial, in: Capsule())
+                        .padding(8)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if let collaborators = viewModel?.collaboratorsByCollectionId[recipe.collectionId], !collaborators.isEmpty {
+                    AvatarGroupView(
+                        collaborators: collaborators,
+                        size: 22,
+                        color: Color.brandGreen
+                    )
+                    .padding(8)
+                }
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(recipe.name)
-                    .font(.body)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text("\(recipe.ingredientCount) ingredients · \(recipe.stepCount) steps")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
         }
-        .padding(.vertical, 2)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var cardImagePlaceholder: some View {
+        Rectangle()
+            .fill(Color.brandGreen.opacity(0.10))
+            .overlay {
+                Image(systemName: "fork.knife")
+                    .font(.title2)
+                    .foregroundStyle(Color.brandGreen.opacity(0.6))
+            }
+    }
+
+    // MARK: - Empty states
+
+    @ViewBuilder
+    private func gridEmptyState(vm: RecipeViewModel) -> some View {
+        if !vm.searchQuery.isEmpty {
+            Text("No recipes match your search")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 32)
+        } else {
+            VStack(spacing: 12) {
+                Image(systemName: "fork.knife")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.secondary)
+                Text(selectedCollection == nil ? "No recipes yet" : "Nothing in this collection yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button {
+                    startNewRecipe(into: selectedCollectionId)
+                } label: {
+                    Label("Add a recipe", systemImage: "plus")
+                        .font(.subheadline.weight(.medium))
+                }
+                .buttonStyle(.bordered)
+                .tint(Color.brandGreen)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 40)
+        }
     }
 
     // MARK: - Move sheet
@@ -474,34 +579,56 @@ struct CollectionBrowserView: View {
         .padding()
     }
 
-    // MARK: - Helpers
+    // MARK: - Selection
 
-    private func ownedBinding(_ id: UUID) -> Binding<Bool> {
-        Binding(
-            get: { expandedCollectionIds.contains(id) },
-            set: { isOpen in
-                if isOpen { expandedCollectionIds.insert(id) } else { expandedCollectionIds.remove(id) }
-                persistExpansion()
+    private func select(_ collectionId: UUID?) {
+        selectedCollectionId = collectionId
+        UserDefaults.standard.set(collectionId?.uuidString ?? "", forKey: Self.selectedKey)
+        if let collectionId {
+            viewModel?.selectCollection(id: collectionId)
+            if viewModel?.sharedCollections.contains(where: { $0.id == collectionId }) == true,
+               sharedRecipesByCollection[collectionId] == nil {
+                Task { await loadSharedRecipes(collectionId: collectionId) }
             }
-        )
+        }
     }
 
-    private func sharedBinding(_ id: UUID) -> Binding<Bool> {
-        Binding(
-            get: { expandedSharedIds.contains(id) },
-            set: { isOpen in
-                if isOpen {
-                    expandedSharedIds.insert(id)
-                    Task { await loadSharedRecipes(collectionId: id) }
-                } else {
-                    expandedSharedIds.remove(id)
+    private func initSelectionIfNeeded() {
+        guard !didInitSelection, let vm = viewModel, !vm.collections.isEmpty || !vm.sharedCollections.isEmpty else { return }
+        didInitSelection = true
+        if let stored = UserDefaults.standard.string(forKey: Self.selectedKey), !stored.isEmpty,
+           let id = UUID(uuidString: stored),
+           vm.allCollections.contains(where: { $0.id == id }) {
+            selectedCollectionId = id
+        }
+    }
+
+    /// Clears the selection if the selected collection disappeared (deleted, unshared).
+    private func validateSelection() {
+        guard let id = selectedCollectionId, let vm = viewModel else { return }
+        if !vm.allCollections.contains(where: { $0.id == id }) {
+            select(nil)
+        }
+    }
+
+    // MARK: - Shared recipes
+
+    /// Fetches recipes for every shared collection so the "All" grid includes them.
+    @MainActor
+    private func loadAllSharedRecipes() async {
+        guard let vm = viewModel else { return }
+        await withTaskGroup(of: Void.self) { group in
+            for collection in vm.sharedCollections where sharedRecipesByCollection[collection.id] == nil {
+                group.addTask { @MainActor in
+                    await loadSharedRecipes(collectionId: collection.id)
                 }
             }
-        )
+        }
     }
 
     @MainActor
     private func loadSharedRecipes(collectionId: UUID) async {
+        guard !loadingSharedIds.contains(collectionId) else { return }
         loadingSharedIds.insert(collectionId)
         defer { loadingSharedIds.remove(collectionId) }
         do {
@@ -509,6 +636,28 @@ struct CollectionBrowserView: View {
         } catch {
             sharedRecipesByCollection[collectionId] = []
             print("[CollectionBrowserView] Failed to load shared recipes: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Actions
+
+    private func deleteCollection(_ collection: RecipeCollection, deleteRecipes: Bool) async {
+        await viewModel?.deleteCollection(id: collection.id, deleteRecipes: deleteRecipes)
+        if selectedCollectionId == collection.id {
+            select(nil)
+        }
+    }
+
+    private func leaveCollection(_ collection: RecipeCollection) {
+        Task {
+            if let email = authViewModel.currentUser?.email {
+                try? await viewModel?.unshareCollection(id: collection.id, email: email)
+                viewModel?.sharedCollections.removeAll { $0.id == collection.id }
+                sharedRecipesByCollection[collection.id] = nil
+                if selectedCollectionId == collection.id {
+                    select(nil)
+                }
+            }
         }
     }
 
@@ -541,29 +690,16 @@ struct CollectionBrowserView: View {
         }
     }
 
-    /// Refetches a shared collection's lazily-loaded recipes after a mutation,
-    /// so collaborator adds/edits show up without collapsing and re-expanding.
+    /// Refetches a shared collection's recipes after a mutation, so
+    /// collaborator adds/edits show up immediately.
     private func reloadSharedRecipesIfNeeded(_ collectionId: UUID?) {
         guard let collectionId,
-              viewModel?.sharedCollections.contains(where: { $0.id == collectionId }) == true,
-              sharedRecipesByCollection[collectionId] != nil || expandedSharedIds.contains(collectionId)
+              viewModel?.sharedCollections.contains(where: { $0.id == collectionId }) == true
         else { return }
-        Task { await loadSharedRecipes(collectionId: collectionId) }
-    }
-
-    private func initExpansionIfNeeded() {
-        guard !didInitExpansion, let vm = viewModel, !vm.collections.isEmpty else { return }
-        didInitExpansion = true
-        if let stored = UserDefaults.standard.array(forKey: Self.expandedKey) as? [String] {
-            expandedCollectionIds = Set(stored.compactMap { UUID(uuidString: $0) })
-        } else {
-            // First run: expand all so recipes are visible right away.
-            expandedCollectionIds = Set(vm.collections.map { $0.id })
+        Task {
+            sharedRecipesByCollection[collectionId] = nil
+            await loadSharedRecipes(collectionId: collectionId)
         }
-    }
-
-    private func persistExpansion() {
-        UserDefaults.standard.set(expandedCollectionIds.map { $0.uuidString }, forKey: Self.expandedKey)
     }
 
     private func initializeViewModelIfNeeded() {
