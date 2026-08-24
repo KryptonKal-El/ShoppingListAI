@@ -29,6 +29,19 @@ import {
 
 export const RecipeContext = createContext(null);
 
+const mapRecipeRow = (row) => ({
+  id: row.id,
+  name: row.name,
+  description: row.description,
+  imageUrl: row.image_url,
+  ingredientCount: row.ingredient_count,
+  stepCount: row.step_count,
+  ownerId: row.owner_id,
+  collectionId: row.collection_id,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
+});
+
 /**
  * Provides recipe and collection state and actions to the component tree.
  * Subscribes to Supabase Realtime listeners scoped to the current user,
@@ -44,6 +57,7 @@ export const RecipeProvider = ({ children }) => {
   const [activeCollectionId, setActiveCollectionId] = useState(null);
   const [allRecipes, setAllRecipes] = useState([]);
   const [sharedCollectionRecipes, setSharedCollectionRecipes] = useState([]);
+  const [sharedRecipesByCollection, setSharedRecipesByCollection] = useState({});
   const [activeRecipeId, setActiveRecipeId] = useState(null);
   const [activeRecipe, setActiveRecipe] = useState(null);
 
@@ -167,6 +181,55 @@ export const RecipeProvider = ({ children }) => {
       supabase.removeChannel(channel);
     };
   }, [isSharedCollection, activeCollectionId]);
+
+  // Fetch recipes for ALL shared collections, so the "All" grid can include
+  // them without making each one active first.
+  const sharedCollectionIdsKey = useMemo(
+    () => (sharedCollections ?? []).map((sc) => sc.collectionId).sort().join(','),
+    [sharedCollections]
+  );
+
+  useEffect(() => {
+    if (!sharedCollectionIdsKey) {
+      setSharedRecipesByCollection({});
+      return;
+    }
+    const ids = sharedCollectionIdsKey.split(',');
+
+    const fetchAll = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('recipes')
+          .select('*')
+          .in('collection_id', ids)
+          .order('created_at', { ascending: true });
+        if (error) {
+          console.error('Failed to fetch shared collections recipes:', error);
+          return;
+        }
+        const byCollection = {};
+        for (const row of data) {
+          (byCollection[row.collection_id] ??= []).push(mapRecipeRow(row));
+        }
+        setSharedRecipesByCollection(byCollection);
+      } catch (error) {
+        console.error('Failed to fetch shared collections recipes:', error);
+      }
+    };
+
+    fetchAll();
+
+    const channel = supabase
+      .channel('shared-collections-recipes-all')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, () => {
+        fetchAll();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [sharedCollectionIdsKey]);
 
   // Subscribe to recipe detail when activeRecipeId changes
   useEffect(() => {
@@ -303,6 +366,7 @@ export const RecipeProvider = ({ children }) => {
     recipes,
     allRecipes,
     sharedCollectionRecipes,
+    sharedRecipesByCollection,
     activeRecipeId,
     activeRecipe,
   };

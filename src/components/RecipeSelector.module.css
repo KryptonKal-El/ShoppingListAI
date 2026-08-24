@@ -1327,3 +1327,244 @@
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+/* --------------------------------------------------------------------------
+   Card grid + collection chips (recipes redesign)
+   -------------------------------------------------------------------------- */
+
+.chipRow {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.75rem;
+  scrollbar-width: none;
+}
+
+.chipRow::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.chip:hover {
+  background: var(--bg-hover);
+}
+
+.chipActive,
+.chipActive:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.chipEmoji {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.collectionHeaderCard {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  margin-bottom: 0.75rem;
+}
+
+.collectionHeaderName {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collectionHeaderSpacer {
+  flex: 1;
+}
+
+.recipeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.recipeCard {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: var(--bg-card);
+  overflow: hidden;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.recipeCard:hover {
+  border-color: var(--border-default);
+  box-shadow: 0 2px 8px var(--overlay-light);
+}
+
+.cardMainBtn {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.cardImageWrap {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  background: var(--primary-tint);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-light);
+}
+
+.cardMarker {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.cardSharedBadge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--info);
+  background: var(--info-tint);
+  padding: 0.1rem 0.35rem;
+  border-radius: 8px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.6rem 0.6rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.cardName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 1.1rem;
+}
+
+.cardMeta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardMenuWrap {
+  position: absolute;
+  bottom: 0.45rem;
+  right: 0.2rem;
+}
+
+.cardMenuBtn {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.cardMenuBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.gridEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 0;
+}
+
+.gridEmptyBtn {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.gridEmptyBtn:hover {
+  background: var(--primary-tint);
+}
+
+@media (max-width: 768px) {
+  .recipeGrid {
+    gap: 0.65rem;
+  }
+
+  .cardImageWrap {
+    height: 110px;
+  }
+}

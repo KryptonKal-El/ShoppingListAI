@@ -731,8 +731,7 @@ export const App = () => {
                 <RecipeSelector
                   collections={recipeState.collections}
                   sharedCollections={recipeState.sharedCollections}
-                  sharedCollectionRecipes={recipeState.sharedCollectionRecipes}
-                  activeCollectionId={recipeState.activeCollectionId}
+                  sharedRecipesByCollection={recipeState.sharedRecipesByCollection}
                   allRecipes={recipeState.allRecipes}
                   onSelect={handleRecipeSelect}
                   onCreate={(collectionId) => { setPendingCollectionId(collectionId ?? null); setShowRecipeForm('create'); }}
@@ -908,8 +907,7 @@ export const App = () => {
             <RecipeSelector
               collections={recipeState.collections}
               sharedCollections={recipeState.sharedCollections}
-              sharedCollectionRecipes={recipeState.sharedCollectionRecipes}
-              activeCollectionId={recipeState.activeCollectionId}
+              sharedRecipesByCollection={recipeState.sharedRecipesByCollection}
               allRecipes={recipeState.allRecipes}
               onSelect={(recipeId) => {
                 recipeActions.selectRecipe(recipeId);
