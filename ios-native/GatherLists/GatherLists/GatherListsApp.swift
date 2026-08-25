@@ -26,7 +26,27 @@ struct GatherListsApp: App {
     @State private var toastController = ToastController()
     @Environment(\.scenePhase) private var scenePhase
     private var appearanceManager = AppearanceManager.shared
-    
+
+    init() {
+        Self.applyBrandTypography()
+    }
+
+    /// Navigation and tab bars draw their text through UIKit appearance proxies,
+    /// which SwiftUI's `.font` environment does not reach.
+    private static func applyBrandTypography() {
+        let navAppearance = UINavigationBar.appearance()
+        navAppearance.largeTitleTextAttributes = [.font: UIFont.quicksand(size: 34, weight: .bold)]
+        navAppearance.titleTextAttributes = [.font: UIFont.quicksand(size: 17, weight: .semibold)]
+
+        let barButtonAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.quicksand(size: 17, weight: .medium)]
+        let barButtonAppearance = UIBarButtonItem.appearance()
+        barButtonAppearance.setTitleTextAttributes(barButtonAttributes, for: .normal)
+        barButtonAppearance.setTitleTextAttributes(barButtonAttributes, for: .highlighted)
+
+        let tabItemAppearance = UITabBarItem.appearance()
+        tabItemAppearance.setTitleTextAttributes([.font: UIFont.quicksand(size: 10, weight: .medium)], for: .normal)
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -48,6 +68,7 @@ struct GatherListsApp: App {
             .environment(appearanceManager)
             .environment(notificationService)
             .environment(toastController)
+            .environment(\.font, .quicksand(.body))
             .preferredColorScheme(appearanceManager.setting.colorScheme)
             .onAppear {
                 appDelegate.notificationService = notificationService

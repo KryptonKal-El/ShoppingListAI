@@ -32,7 +32,7 @@ struct EmojiPickerView: View {
                     ForEach(filteredCategories, id: \.name) { category in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(category.name)
-                                .font(.headline)
+                                .font(.quicksand(.headline))
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal)
                             
@@ -43,7 +43,7 @@ struct EmojiPickerView: View {
                                         dismiss()
                                     } label: {
                                         Text(emoji)
-                                            .font(.system(size: 28))
+                                            .font(.quicksand(size: 28))
                                             .frame(width: 44, height: 44)
                                             .background(
                                                 selectedEmoji == emoji

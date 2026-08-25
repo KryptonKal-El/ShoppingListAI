@@ -317,7 +317,7 @@ struct CollectionBrowserView: View {
                 Text(label)
                     .fontWeight(isSelected ? .semibold : .medium)
             }
-            .font(.subheadline)
+            .font(.quicksand(.subheadline))
             .lineLimit(1)
             .padding(.horizontal, 13)
             .padding(.vertical, 8)
@@ -353,12 +353,12 @@ struct CollectionBrowserView: View {
     private func collectionHeaderCard(_ collection: RecipeCollection) -> some View {
         HStack(spacing: 10) {
             Text((collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁")
-                .font(.title3)
+                .font(.quicksand(.title3))
             Text(collection.name)
-                .font(.headline)
+                .font(.quicksand(.headline))
                 .lineLimit(1)
             Text("\(recipeCount(for: collection))")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
             Spacer(minLength: 8)
             if let collaborators = viewModel?.collaboratorsByCollectionId[collection.id], !collaborators.isEmpty {
@@ -372,7 +372,7 @@ struct CollectionBrowserView: View {
                 startNewRecipe(into: collection.id)
             } label: {
                 Image(systemName: "plus")
-                    .font(.body)
+                    .font(.quicksand(.body))
                     .foregroundStyle(Color.brandGreen)
                     .frame(width: 28, height: 28)
             }
@@ -382,7 +382,7 @@ struct CollectionBrowserView: View {
                 collectionMenuItems(collection)
             } label: {
                 Image(systemName: "ellipsis")
-                    .font(.body)
+                    .font(.quicksand(.body))
                     .foregroundStyle(Color.brandGreen)
                     .frame(width: 28, height: 28)
             }
@@ -434,7 +434,7 @@ struct CollectionBrowserView: View {
                 // Collection marker, shown in the "All" view where the grid mixes collections.
                 if selectedCollectionId == nil, let collection = collection(for: recipe) {
                     Text((collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .padding(.horizontal, 7)
                         .padding(.vertical, 2)
                         .background(.thinMaterial, in: Capsule())
@@ -454,12 +454,12 @@ struct CollectionBrowserView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(recipe.name)
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text("\(recipe.ingredientCount) ingredients · \(recipe.stepCount) steps")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -477,7 +477,7 @@ struct CollectionBrowserView: View {
             .fill(Color.brandGreen.opacity(0.10))
             .overlay {
                 Image(systemName: "fork.knife")
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .foregroundStyle(Color.brandGreen.opacity(0.6))
             }
     }
@@ -494,16 +494,16 @@ struct CollectionBrowserView: View {
         } else {
             VStack(spacing: 12) {
                 Image(systemName: "fork.knife")
-                    .font(.system(size: 32))
+                    .font(.quicksand(size: 32))
                     .foregroundStyle(.secondary)
                 Text(selectedCollection == nil ? "No recipes yet" : "Nothing in this collection yet")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 Button {
                     startNewRecipe(into: selectedCollectionId)
                 } label: {
                     Label("Add a recipe", systemImage: "plus")
-                        .font(.subheadline.weight(.medium))
+                        .font(.quicksand(.subheadline, weight: .medium))
                 }
                 .buttonStyle(.bordered)
                 .tint(Color.brandGreen)
@@ -530,8 +530,8 @@ struct CollectionBrowserView: View {
                         }
                     } label: {
                         HStack(spacing: 12) {
-                            Text((target.emoji?.containsVisualEmoji == true ? target.emoji : nil) ?? "📁").font(.title2)
-                            Text(target.name).font(.body)
+                            Text((target.emoji?.containsVisualEmoji == true ? target.emoji : nil) ?? "📁").font(.quicksand(.title2))
+                            Text(target.name).font(.quicksand(.body))
                             Spacer()
                         }
                     }
@@ -553,18 +553,18 @@ struct CollectionBrowserView: View {
     private var loadingView: some View {
         VStack(spacing: 12) {
             ProgressView().scaleEffect(1.2)
-            Text("Loading recipes...").font(.subheadline).foregroundStyle(.secondary)
+            Text("Loading recipes...").font(.quicksand(.subheadline)).foregroundStyle(.secondary)
         }
     }
 
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
-            Text("No recipes yet").font(.title2).fontWeight(.semibold)
+            Text("No recipes yet").font(.quicksand(.title2)).fontWeight(.semibold)
             Text("Add a recipe or create a collection to organize them.")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             Button {

@@ -8,23 +8,23 @@ struct ListDetailPlaceholderView: View {
         VStack(spacing: 16) {
             if let emoji = list.emoji, emoji.containsVisualEmoji {
                 Text(emoji)
-                    .font(.system(size: 64))
+                    .font(.quicksand(size: 64))
             } else {
                 Image(systemName: "list.bullet")
-                    .font(.system(size: 48))
+                    .font(.quicksand(size: 48))
                     .foregroundStyle(.secondary)
             }
             
             Text(list.name)
-                .font(.title)
+                .font(.quicksand(.title))
                 .fontWeight(.semibold)
             
             Text("\(list.itemCount) items")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
             
             Text("Items view coming in Phase 3")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.tertiary)
                 .padding(.top, 24)
         }

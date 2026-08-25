@@ -207,7 +207,7 @@ struct RecipeFormSheet: View {
                             showingImageMenu = true
                         } label: {
                             Label("Change", systemImage: "arrow.triangle.2.circlepath")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background(.ultraThinMaterial)
@@ -217,7 +217,7 @@ struct RecipeFormSheet: View {
                             removeImage()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.title3)
+                                .font(.quicksand(.title3))
                                 .foregroundStyle(.white, .black.opacity(0.5))
                         }
                     }
@@ -247,7 +247,7 @@ struct RecipeFormSheet: View {
                             showingImageMenu = true
                         } label: {
                             Label("Change", systemImage: "arrow.triangle.2.circlepath")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background(.ultraThinMaterial)
@@ -257,7 +257,7 @@ struct RecipeFormSheet: View {
                             removeImage()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.title3)
+                                .font(.quicksand(.title3))
                                 .foregroundStyle(.white, .black.opacity(0.5))
                         }
                     }
@@ -269,10 +269,10 @@ struct RecipeFormSheet: View {
                 } label: {
                     VStack(spacing: 8) {
                         Image(systemName: "camera")
-                            .font(.title)
+                            .font(.quicksand(.title))
                             .foregroundStyle(.secondary)
                         Text("Add Photo")
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, minHeight: 120)
@@ -308,10 +308,10 @@ struct RecipeFormSheet: View {
     private func urlPlaceholder(error: Bool) -> some View {
         VStack(spacing: 8) {
             Image(systemName: error ? "exclamationmark.triangle" : "link")
-                .font(.title)
+                .font(.quicksand(.title))
                 .foregroundStyle(.secondary)
             Text(error ? "Failed to load image" : "Loading...")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, minHeight: 120)
@@ -334,7 +334,7 @@ struct RecipeFormSheet: View {
             
             if attemptedSave && trimmedName.isEmpty {
                 Text("Name is required")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.red)
             }
             
@@ -376,7 +376,7 @@ struct RecipeFormSheet: View {
             
             if attemptedSave && validIngredients.isEmpty {
                 Text("At least one ingredient is required")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.red)
             }
         } header: {

@@ -72,10 +72,10 @@ struct EditListSheet: View {
                         HStack {
                         if let emoji = selectedEmoji, emoji.containsVisualEmoji {
                             Text(emoji)
-                                    .font(.system(size: 32))
+                                    .font(.quicksand(size: 32))
                             } else {
                                 Image(systemName: "face.smiling")
-                                    .font(.title2)
+                                    .font(.quicksand(.title2))
                                     .foregroundStyle(.secondary)
                             }
                             
@@ -85,7 +85,7 @@ struct EditListSheet: View {
                                 .foregroundStyle(.secondary)
                             
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.tertiary)
                         }
                         .contentShape(Rectangle())
@@ -156,7 +156,7 @@ struct EditListSheet: View {
                             .overlay {
                                 if selectedPresetColor == colorHex {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.quicksand(size: 14, weight: .bold))
                                         .foregroundStyle(Color(hex: "#2C3E35"))
                                 }
                             }
@@ -188,7 +188,7 @@ struct EditListSheet: View {
                     VStack(spacing: 4) {
                         ListTypeIconView(typeId: typeId, size: 28)
                         Text(config.label)
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .fontWeight(.semibold)
                             .foregroundStyle(isCurrent ? Color(hex: "#3D7A63") : .primary)
                     }

@@ -157,7 +157,7 @@ struct RecipeDetailView: View {
                 
                 if let description = recipe.description, !description.isEmpty {
                     Text(description)
-                        .font(.body)
+                        .font(.quicksand(.body))
                         .foregroundStyle(.secondary)
                 }
                 
@@ -210,21 +210,21 @@ struct RecipeDetailView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(history.count == 1 ? "Cooked once" : "Cooked \(history.count) times")
-                            .font(.body)
+                            .font(.quicksand(.body))
                             .fontWeight(.medium)
                             .foregroundStyle(.primary)
                         if let lastCooked = history.first?.completedAt {
                             Text("Last cooked \(lastCooked.formatted(.relative(presentation: .named)))")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.secondary)
                         }
                     }
                     Spacer()
                     Image(systemName: "chevron.right")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                 }
                 .padding(14)
@@ -244,17 +244,17 @@ struct RecipeDetailView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(session.completedAt ?? session.startedAt, style: .date)
-                            .font(.body)
+                            .font(.quicksand(.body))
                         Text(historyDuration(session))
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Text(session.completedAt ?? session.startedAt, style: .relative)
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -289,10 +289,10 @@ struct RecipeDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Ingredients")
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .fontWeight(.bold)
                 Text("\(ingredients.count)")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(Color(.systemGray5))
@@ -306,7 +306,7 @@ struct RecipeDetailView: View {
                     } label: {
                         Image(systemName: checkedIngredients.contains(ingredient.id) ? "checkmark.circle.fill" : "circle")
                             .foregroundStyle(checkedIngredients.contains(ingredient.id) ? .green : .secondary)
-                            .font(.title3)
+                            .font(.quicksand(.title3))
                     }
                     .buttonStyle(.plain)
                     
@@ -316,7 +316,7 @@ struct RecipeDetailView: View {
                             .foregroundStyle(checkedIngredients.contains(ingredient.id) ? .secondary : .primary)
                         if let qty = ingredient.quantity, !qty.isEmpty {
                             Text(qty)
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -353,10 +353,10 @@ struct RecipeDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Steps")
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .fontWeight(.bold)
                 Text("\(steps.count)")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(Color(.systemGray5))
@@ -366,7 +366,7 @@ struct RecipeDetailView: View {
             ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
                 HStack(alignment: .top, spacing: 12) {
                     Text("\(index + 1)")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .frame(width: 28, height: 28)
@@ -374,7 +374,7 @@ struct RecipeDetailView: View {
                         .clipShape(Circle())
                     
                     Text(step.instruction)
-                        .font(.body)
+                        .font(.quicksand(.body))
                 }
             }
         }
@@ -393,9 +393,9 @@ struct RecipeDetailView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Text((targetCollection.emoji?.containsVisualEmoji == true ? targetCollection.emoji : nil) ?? "📁")
-                                .font(.title2)
+                                .font(.quicksand(.title2))
                             Text(targetCollection.name)
-                                .font(.body)
+                                .font(.quicksand(.body))
                             Spacer()
                         }
                     }

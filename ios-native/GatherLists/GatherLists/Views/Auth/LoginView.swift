@@ -60,7 +60,7 @@ struct LoginView: View {
                         .fill(Color.secondary.opacity(0.3))
                         .frame(height: 1)
                     Text("or")
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundColor(.secondary)
                     Rectangle()
                         .fill(Color.secondary.opacity(0.3))
@@ -81,7 +81,7 @@ struct LoginView: View {
                         
                         if !email.isEmpty && !isEmailValid {
                             Text("Enter a valid email address")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundColor(.red)
                         }
                     }
@@ -95,7 +95,7 @@ struct LoginView: View {
                         
                         if !password.isEmpty && !isPasswordValid {
                             Text("Password must be at least 6 characters")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundColor(.red)
                         }
                     }
@@ -127,7 +127,7 @@ struct LoginView: View {
                         }
                     } label: {
                         Text(isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up")
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                             .foregroundColor(Color.brandGreen)
                     }
                 }
@@ -136,7 +136,7 @@ struct LoginView: View {
                 if let error = authViewModel.error {
                     Text(error)
                         .foregroundColor(.red)
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }

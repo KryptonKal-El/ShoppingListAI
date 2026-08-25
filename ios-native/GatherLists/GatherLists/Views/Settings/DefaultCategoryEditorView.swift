@@ -157,7 +157,7 @@ struct DefaultCategoryEditorView: View {
                     
                     if !category.keywords.isEmpty {
                         Text("\(category.keywords.count) keyword\(category.keywords.count == 1 ? "" : "s")")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -165,7 +165,7 @@ struct DefaultCategoryEditorView: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.tertiary)
             }
         }

@@ -13,9 +13,9 @@ struct SuggestionsView: View {
         else {
             VStack(alignment: .leading, spacing: 8) {
                 Text("AI Suggestions")
-                    .font(.headline)
+                    .font(.quicksand(.headline))
                 Text("Based on your shopping habits")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 
                 let visible = shouldCollapse && !isExpanded
@@ -34,17 +34,17 @@ struct SuggestionsView: View {
                                 
                                 VStack(alignment: .leading, spacing: 1) {
                                     Text(suggestion.name)
-                                        .font(.subheadline.weight(.medium))
+                                        .font(.quicksand(.subheadline, weight: .medium))
                                         .foregroundStyle(.primary)
                                     Text(suggestion.reason)
-                                        .font(.caption2)
+                                        .font(.quicksand(.caption2))
                                         .foregroundStyle(.secondary)
                                 }
                                 
                                 Spacer(minLength: 0)
                                 
                                 Image(systemName: "plus")
-                                    .font(.caption.weight(.semibold))
+                                    .font(.quicksand(.caption, weight: .semibold))
                                     .foregroundStyle(.secondary)
                             }
                             .padding(.horizontal, 10)
@@ -64,7 +64,7 @@ struct SuggestionsView: View {
                         withAnimation { isExpanded.toggle() }
                     } label: {
                         Text(isExpanded ? "Show less" : "Show \(suggestions.count - collapsedLimit) more")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.blue)
                     }
                 }

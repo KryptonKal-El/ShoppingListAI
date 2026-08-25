@@ -49,7 +49,7 @@ struct RecipeImportView: View {
                     ProgressView()
                         .scaleEffect(1.2)
                     Text("Reading your recipe…")
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundStyle(.secondary)
                 }
             }

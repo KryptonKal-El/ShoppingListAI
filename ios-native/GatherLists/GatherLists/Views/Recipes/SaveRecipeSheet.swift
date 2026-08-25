@@ -47,10 +47,10 @@ struct SaveRecipeSheet: View {
     private func successView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 56))
+                .font(.quicksand(size: 56))
                 .foregroundStyle(.green)
             Text(message)
-                .font(.headline)
+                .font(.quicksand(.headline))
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,12 +60,12 @@ struct SaveRecipeSheet: View {
     private var emptyView: some View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
             Text("No Collections")
-                .font(.headline)
+                .font(.quicksand(.headline))
             Text("Create a collection first to save recipes.")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -79,7 +79,7 @@ struct SaveRecipeSheet: View {
             Form {
                 Section {
                     Text(recipeDetail.title)
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundStyle(.secondary)
                 }
                 
@@ -90,7 +90,7 @@ struct SaveRecipeSheet: View {
                         } label: {
                             HStack {
                                 Text((collection.emoji?.containsVisualEmoji == true ? collection.emoji : nil) ?? "📁")
-                                    .font(.title3)
+                                    .font(.quicksand(.title3))
                                 Text(collection.name)
                                     .foregroundStyle(.primary)
                                 Spacer()
@@ -111,7 +111,7 @@ struct SaveRecipeSheet: View {
                     Section {
                         Text(error)
                             .foregroundStyle(.red)
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                     }
                 }
             }

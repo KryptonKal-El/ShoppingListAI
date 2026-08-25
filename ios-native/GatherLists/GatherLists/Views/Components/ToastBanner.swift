@@ -89,10 +89,10 @@ struct ToastBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: variant.symbolName)
-                .font(.subheadline.weight(.semibold))
+                .font(.quicksand(.subheadline, weight: .semibold))
 
             Text(message)
-                .font(.subheadline.weight(.semibold))
+                .font(.quicksand(.subheadline, weight: .semibold))
                 .fixedSize(horizontal: false, vertical: true)
 
             Spacer(minLength: 0)

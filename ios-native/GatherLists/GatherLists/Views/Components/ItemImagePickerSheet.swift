@@ -55,7 +55,7 @@ struct ItemImagePickerSheet: View {
                     if let error = errorMessage {
                         Text(error)
                             .foregroundStyle(.red)
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                     }
                 }
                 .padding()
@@ -105,7 +105,7 @@ struct ItemImagePickerSheet: View {
                         .scaledToFit()
                 case .failure:
                     Image(systemName: "photo")
-                        .font(.system(size: 60))
+                        .font(.quicksand(size: 60))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 300)
@@ -191,7 +191,7 @@ struct ItemImagePickerSheet: View {
                         ForEach(searchResultGroups, id: \.source) { group in
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(group.label)
-                                    .font(.caption)
+                                    .font(.quicksand(.caption))
                                     .foregroundStyle(.secondary)
                                 
                                 LazyVGrid(

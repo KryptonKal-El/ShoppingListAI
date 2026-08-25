@@ -42,10 +42,10 @@ struct SettingsView: View {
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(authViewModel.displayName)
-                                .font(.headline)
+                                .font(.quicksand(.headline))
                             if let email = authViewModel.email {
                                 Text(email)
-                                    .font(.subheadline)
+                                    .font(.quicksand(.subheadline))
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -53,7 +53,7 @@ struct SettingsView: View {
                     
                     if let error = uploadError {
                         Text(error)
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.red)
                     }
                     
@@ -67,7 +67,7 @@ struct SettingsView: View {
                             Text(authViewModel.displayName)
                                 .foregroundStyle(.secondary)
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.tertiary)
                         }
                     }
@@ -246,7 +246,7 @@ struct SettingsView: View {
             .frame(width: 56, height: 56)
             .overlay(
                 Text(String(authViewModel.displayName.prefix(1)).uppercased())
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
             )

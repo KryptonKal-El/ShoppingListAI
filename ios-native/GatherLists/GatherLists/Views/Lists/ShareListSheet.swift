@@ -120,7 +120,7 @@ struct ShareListSheet: View {
                         } label: {
                             HStack {
                                 Image(systemName: "clock.arrow.circlepath")
-                                    .font(.caption)
+                                    .font(.quicksand(.caption))
                                     .foregroundStyle(.secondary)
                                 Text(suggestion)
                                     .foregroundStyle(.primary)
@@ -151,7 +151,7 @@ struct ShareListSheet: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.orange)
             Text(message)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
@@ -166,7 +166,7 @@ struct ShareListSheet: View {
                 Spacer()
                 ProgressView()
                 Text("Loading collaborators...")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 Spacer()
             }
@@ -174,12 +174,12 @@ struct ShareListSheet: View {
             VStack(spacing: 12) {
                 Spacer()
                 Image(systemName: "person.2.slash")
-                    .font(.system(size: 40))
+                    .font(.quicksand(size: 40))
                     .foregroundStyle(.secondary)
                 Text("No collaborators yet")
-                    .font(.headline)
+                    .font(.quicksand(.headline))
                 Text("Add people by email to share this list.")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 Spacer()
             }
@@ -205,9 +205,9 @@ struct ShareListSheet: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(share.sharedWithEmail)
-                    .font(.body)
+                    .font(.quicksand(.body))
                 Text("Added \(share.addedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.secondary)
             }
             

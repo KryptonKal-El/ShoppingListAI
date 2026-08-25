@@ -16,7 +16,7 @@ struct MainTabView: View {
                     Image(systemName: "wifi.slash")
                     Text("No Internet Connection")
                 }
-                .font(.subheadline.weight(.semibold))
+                .font(.quicksand(.subheadline, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)

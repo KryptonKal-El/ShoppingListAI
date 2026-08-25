@@ -338,11 +338,11 @@ struct ListDetailView: View {
                 .opacity(0.5)
             
             Text("Your list is empty")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text("Add items below")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -384,7 +384,7 @@ struct ListDetailView: View {
                 rsvpStatLabel("\(summary.notInvited)", "Not Invited", Color(hex: "#9e9e9e"))
             }
             Text("Total Guests: \(summary.totalHeadCount)")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .fontWeight(.bold)
         }
         .padding(.horizontal, 16)
@@ -395,10 +395,10 @@ struct ListDetailView: View {
     private func rsvpStatLabel(_ count: String, _ label: String, _ color: Color) -> some View {
         VStack(spacing: 1) {
             Text(count)
-                .font(.title3).fontWeight(.bold)
+                .font(.quicksand(.title3)).fontWeight(.bold)
                 .foregroundStyle(color)
             Text(label)
-                .font(.caption).fontWeight(.medium)
+                .font(.quicksand(.caption)).fontWeight(.medium)
                 .foregroundStyle(color)
         }
     }
@@ -572,7 +572,7 @@ struct ListDetailView: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.quicksand(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .rotationEffect(.degrees(isCollapsed ? 0 : 90))
                 
@@ -581,18 +581,18 @@ struct ListDetailView: View {
                     .frame(width: 10, height: 10)
                 
                 Text(group.label)
-                    .font(.headline)
+                    .font(.quicksand(.headline))
                     .foregroundStyle(.primary)
                 
                 Text("(\(itemCount))")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 if total > Decimal.zero {
                     Text(formatPrice(total))
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .fontWeight(.medium)
                         .foregroundStyle(Color(hex: "#3D7A63"))
                 }
@@ -684,11 +684,11 @@ struct ListDetailView: View {
     private func categoryHeader(label: String, color: String, itemCount: Int) -> some View {
         HStack(spacing: 8) {
             Text(label)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .fontWeight(.medium)
                 .foregroundStyle(Color(hex: color))
             Text("(\(itemCount))")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.tertiary)
             Spacer()
         }
@@ -721,7 +721,7 @@ struct ListDetailView: View {
                         .foregroundStyle(effectiveIsChecked ? .secondary : .primary)
                     if let note = item.note, !note.isEmpty {
                         Text(note)
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.secondary)
                             .lineLimit(2)
                     }
@@ -730,7 +730,7 @@ struct ListDetailView: View {
                 if detailViewModel?.typeConfig.fields.quantity == true {
                     if item.unit != "each" {
                         Text("\(item.quantity) \(item.unit)")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .fontWeight(.medium)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
@@ -741,7 +741,7 @@ struct ListDetailView: View {
                             )
                     } else if item.quantity > 1 {
                         Text("×\(item.quantity)")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .fontWeight(.medium)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
@@ -759,10 +759,10 @@ struct ListDetailView: View {
                     HStack(spacing: 2) {
                         if item.recurrenceRule != nil {
                             Text("↻")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                         }
                         Text("Due \(formatDueDateLabel(dueDate))")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                     }
                     .foregroundStyle(isOverdue ? .red : .secondary)
                 }
@@ -772,7 +772,7 @@ struct ListDetailView: View {
                 if detailViewModel?.typeConfig.fields.price == true {
                     if let price = item.price {
                         Text(formatPrice(price))
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                             .foregroundStyle(effectiveIsChecked ? .tertiary : .secondary)
                     }
                 }
@@ -796,7 +796,7 @@ struct ListDetailView: View {
                             }
                         } label: {
                             Text(rsvpDisplayName(for: item.rsvpStatus ?? "not_invited"))
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .fontWeight(.medium)
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 8)
@@ -808,7 +808,7 @@ struct ListDetailView: View {
                         }
                     } else {
                         Text(rsvpDisplayName(for: item.rsvpStatus ?? "not_invited"))
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -828,7 +828,7 @@ struct ListDetailView: View {
                 editSheetItem = item
             } label: {
                 Image(systemName: "pencil")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                     .frame(width: 44)
                     .frame(maxHeight: .infinity)
@@ -884,7 +884,7 @@ struct ListDetailView: View {
                         .fill(Color(.systemGray5))
                         .overlay {
                             Image(systemName: "exclamationmark.triangle")
-                                .font(.caption2)
+                                .font(.quicksand(.caption2))
                                 .foregroundStyle(.secondary)
                         }
                 case .empty:
@@ -906,7 +906,7 @@ struct ListDetailView: View {
                 .frame(width: 36, height: 36)
                 .overlay {
                     Image(systemName: "plus")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                 }
                 .onTapGesture {
@@ -1196,16 +1196,16 @@ struct ListDetailView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.quicksand(size: 12, weight: .semibold))
                             .foregroundStyle(.secondary)
                             .rotationEffect(.degrees(isCheckedCollapsed ? 0 : 90))
                         
                         Text("Crossed")
-                            .font(.headline)
+                            .font(.quicksand(.headline))
                             .foregroundStyle(.primary)
                         
                         Text("(\(allChecked.count))")
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                             .foregroundStyle(.secondary)
                         
                         Spacer()
@@ -1213,7 +1213,7 @@ struct ListDetailView: View {
                         Button("Clear crossed") {
                             showClearCheckedAlert = true
                         }
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundStyle(.red)
                     }
                     .padding(.horizontal, 16)
@@ -1274,7 +1274,7 @@ struct ListDetailView: View {
             showSortSheet = true
         } label: {
             Image(systemName: "arrow.up.arrow.down")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.white)
         }
         .sheet(isPresented: $showSortSheet) {
@@ -1362,7 +1362,7 @@ struct ListDetailView: View {
               .accessibilityIdentifier("ownerMenu-deleteList")
            } label: {
                Image(systemName: "ellipsis")
-                   .font(.subheadline)
+                   .font(.quicksand(.subheadline))
                    .foregroundStyle(.white)
                    .accessibilityLabel("List options")
            }
@@ -1446,7 +1446,7 @@ struct ListDetailView: View {
                }
            } label: {
                Image(systemName: "ellipsis")
-                   .font(.subheadline)
+                   .font(.quicksand(.subheadline))
                    .foregroundStyle(.white)
                    .accessibilityLabel("List options")
            }
@@ -1473,16 +1473,16 @@ struct ListDetailView: View {
                     HStack {
                         Image(systemName: "clock.arrow.circlepath")
                             .foregroundStyle(.secondary)
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                         Text(suggestion.name)
                             .foregroundStyle(.primary)
                         Spacer()
                         if let storeName = detailViewModel?.storeName(for: suggestion.storeId) {
                             HStack(spacing: 4) {
                                 Image(systemName: "storefront")
-                                    .font(.caption2)
+                                    .font(.quicksand(.caption2))
                                 Text(storeName)
-                                    .font(.caption)
+                                    .font(.quicksand(.caption))
                             }
                             .foregroundStyle(.secondary)
                         }
@@ -1527,7 +1527,7 @@ struct ListDetailView: View {
                 handleAddItem()
             } label: {
                 Image(systemName: "plus.circle.fill")
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .foregroundStyle(isItemNameEmpty ? Color(.tertiaryLabel) : listColor)
             }
             .disabled(isItemNameEmpty)
@@ -1575,16 +1575,16 @@ struct ListDetailView: View {
                 let storeColor = store.color.flatMap { Color(hex: $0) } ?? Color.secondary
                 VStack(spacing: 2) {
                     Image(systemName: "storefront")
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundStyle(storeColor)
                     Text(store.name)
-                        .font(.caption2)
+                        .font(.quicksand(.caption2))
                         .foregroundStyle(storeColor)
                         .lineLimit(1)
                 }
             } else {
                 Image(systemName: "storefront")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
             }
         }

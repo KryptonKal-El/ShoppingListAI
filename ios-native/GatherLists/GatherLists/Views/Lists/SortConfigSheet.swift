@@ -109,7 +109,7 @@ struct SortConfigSheet: View {
         Section {
             if groupLevels.isEmpty {
                 Text("No grouping — items shown in a flat list")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                     .italic()
             } else {
@@ -120,7 +120,7 @@ struct SortConfigSheet: View {
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .foregroundStyle(.red)
-                                .font(.title3)
+                                .font(.quicksand(.title3))
                         }
                         .buttonStyle(.plain)
                         
@@ -165,7 +165,7 @@ struct SortConfigSheet: View {
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .foregroundStyle(.red)
-                                .font(.title3)
+                                .font(.quicksand(.title3))
                         }
                         .buttonStyle(.plain)
                     }

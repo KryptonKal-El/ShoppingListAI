@@ -74,7 +74,7 @@ struct ShareCollectionSheet: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.orange)
             Text(message)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
@@ -89,7 +89,7 @@ struct ShareCollectionSheet: View {
                 Spacer()
                 ProgressView()
                 Text("Loading collaborators...")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 Spacer()
             }
@@ -97,12 +97,12 @@ struct ShareCollectionSheet: View {
             VStack(spacing: 12) {
                 Spacer()
                 Image(systemName: "person.2.slash")
-                    .font(.system(size: 40))
+                    .font(.quicksand(size: 40))
                     .foregroundStyle(.secondary)
                 Text("No collaborators yet")
-                    .font(.headline)
+                    .font(.quicksand(.headline))
                 Text("Add people by email to share this collection.")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .foregroundStyle(.secondary)
                 Spacer()
             }
@@ -128,9 +128,9 @@ struct ShareCollectionSheet: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(share.sharedWithEmail)
-                    .font(.body)
+                    .font(.quicksand(.body))
                 Text("Added \(share.addedAt.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.secondary)
             }
             

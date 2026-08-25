@@ -253,7 +253,7 @@ struct EditItemSheet: View {
                             if customFrequency == "week" {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("On days")
-                                        .font(.subheadline)
+                                        .font(.quicksand(.subheadline))
                                         .foregroundStyle(.secondary)
                                     HStack(spacing: 8) {
                                         ForEach(daysOfWeek, id: \.0) { day in
@@ -265,7 +265,7 @@ struct EditItemSheet: View {
                                                 }
                                             } label: {
                                                 Text(day.1)
-                                                    .font(.caption.bold())
+                                                    .font(.quicksand(.caption, weight: .bold))
                                                     .frame(width: 32, height: 32)
                                                     .background(selectedDaysOfWeek.contains(day.0) ? Color.accentColor : Color(.systemGray5))
                                                     .foregroundStyle(selectedDaysOfWeek.contains(day.0) ? .white : .primary)

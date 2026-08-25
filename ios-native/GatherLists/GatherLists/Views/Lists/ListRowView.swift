@@ -14,31 +14,31 @@ struct ListRowView: View {
             
             if let emoji = list.emoji, emoji.containsVisualEmoji {
                 Text(emoji)
-                    .font(.title2)
+                    .font(.quicksand(.title2))
                     .alignmentGuide(.listRowSeparatorLeading) { d in d[.leading] }
             } else {
                 Image(systemName: "list.bullet")
-                    .font(.title3)
+                    .font(.quicksand(.title3))
                     .foregroundStyle(.secondary)
                     .alignmentGuide(.listRowSeparatorLeading) { d in d[.leading] }
             }
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(list.name)
-                    .font(.body)
+                    .font(.quicksand(.body))
                     .lineLimit(1)
                 
                 HStack(spacing: 6) {
                     Text("\(list.itemCount) items")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                     
                     Text("·")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                     
                     Text(ListTypes.getConfig(list.type).label)
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                 }
             }

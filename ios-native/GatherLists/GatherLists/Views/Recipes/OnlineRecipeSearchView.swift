@@ -123,7 +123,7 @@ struct OnlineRecipeSearchView: View {
             Text("Powered by")
             Link("Spoonacular", destination: URL(string: "https://spoonacular.com")!)
         }
-        .font(.caption2)
+        .font(.quicksand(.caption2))
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
@@ -154,21 +154,21 @@ struct OnlineRecipeSearchView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(recipe.title)
-                    .font(.body)
+                    .font(.quicksand(.body))
                     .fontWeight(.medium)
                     .lineLimit(2)
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
                 
                 Text("\(recipe.readyInMinutes) min • \(recipe.servings) servings")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.secondary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.tertiary)
         }
         .padding(.horizontal)
@@ -186,7 +186,7 @@ struct OnlineRecipeSearchView: View {
                         .aspectRatio(contentMode: .fill)
                 case .failure:
                     Image(systemName: "photo")
-                        .font(.largeTitle)
+                        .font(.quicksand(.largeTitle))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color(.systemGray5))
@@ -203,14 +203,14 @@ struct OnlineRecipeSearchView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(recipe.title)
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .fontWeight(.medium)
                     .lineLimit(2)
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
                 
                 Text("\(recipe.readyInMinutes) min • \(recipe.servings) servings")
-                    .font(.caption2)
+                    .font(.quicksand(.caption2))
                     .foregroundStyle(.secondary)
             }
             .padding(8)
@@ -225,7 +225,7 @@ struct OnlineRecipeSearchView: View {
             ProgressView()
                 .scaleEffect(1.2)
             Text("Searching recipes...")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
     }
@@ -234,15 +234,15 @@ struct OnlineRecipeSearchView: View {
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.orange)
             
             Text("Search unavailable")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text(message)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
@@ -263,15 +263,15 @@ struct OnlineRecipeSearchView: View {
     private var emptyResultsView: some View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
             
             Text("No recipes found")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text("No recipes found for '\(searchText)'")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -281,15 +281,15 @@ struct OnlineRecipeSearchView: View {
     private var initialStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
             
             Text("Search for recipes")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text("Search for recipes to get started")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
             
             attributionView

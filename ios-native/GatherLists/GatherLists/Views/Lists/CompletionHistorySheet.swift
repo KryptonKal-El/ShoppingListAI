@@ -26,11 +26,11 @@ struct CompletionHistorySheet: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 if let dueDate = item.dueDate {
                                     Text("Due: \(dueDate, format: .dateTime.month().day().year())")
-                                        .font(.subheadline)
+                                        .font(.quicksand(.subheadline))
                                 }
                                 if let checkedAt = item.checkedAt {
                                     Text("Completed: \(checkedAt, format: .dateTime.month().day().year())")
-                                        .font(.caption)
+                                        .font(.quicksand(.caption))
                                         .foregroundStyle(.secondary)
                                 }
                             }

@@ -185,7 +185,7 @@ struct CategoryEditorSheet: View {
                     
                     if !category.keywords.isEmpty {
                         Text("\(category.keywords.count) keyword\(category.keywords.count == 1 ? "" : "s")")
-                            .font(.caption)
+                            .font(.quicksand(.caption))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -193,7 +193,7 @@ struct CategoryEditorSheet: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.tertiary)
             }
             .contentShape(Rectangle())
@@ -339,7 +339,7 @@ struct CategoryDetailEditor: View {
                                     .overlay {
                                         if selectedColor == colorHex {
                                             Image(systemName: "checkmark")
-                                                .font(.subheadline.bold())
+                                                .font(.quicksand(.subheadline, weight: .bold))
                                                 .foregroundStyle(.white)
                                         }
                                     }

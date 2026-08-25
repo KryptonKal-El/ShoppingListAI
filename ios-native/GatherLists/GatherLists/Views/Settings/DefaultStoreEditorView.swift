@@ -126,7 +126,7 @@ struct DefaultStoreEditorView: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.tertiary)
             }
         }

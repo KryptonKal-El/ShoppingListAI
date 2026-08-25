@@ -59,7 +59,7 @@ struct AvatarGroupView: View {
             .frame(width: size, height: size)
             .overlay(
                 Text("+\(overflowCount)")
-                    .font(.system(size: size * 0.4))
+                    .font(.quicksand(size: size * 0.4))
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
             )
@@ -82,23 +82,23 @@ struct AvatarGroupView: View {
     
     VStack(spacing: 24) {
         Text("3 of 5 collaborators")
-            .font(.caption)
+            .font(.quicksand(.caption))
         AvatarGroupView(collaborators: profiles)
         
         Text("Max 2 display")
-            .font(.caption)
+            .font(.quicksand(.caption))
         AvatarGroupView(collaborators: profiles, maxDisplay: 2)
         
         Text("Larger size")
-            .font(.caption)
+            .font(.quicksand(.caption))
         AvatarGroupView(collaborators: profiles, size: 36, color: .purple)
         
         Text("2 collaborators (no overflow)")
-            .font(.caption)
+            .font(.quicksand(.caption))
         AvatarGroupView(collaborators: Array(profiles.prefix(2)))
         
         Text("Empty")
-            .font(.caption)
+            .font(.quicksand(.caption))
         AvatarGroupView(collaborators: [])
     }
     .padding()

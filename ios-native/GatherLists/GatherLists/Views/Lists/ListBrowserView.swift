@@ -318,7 +318,7 @@ struct ListBrowserView: View {
             ProgressView()
                 .scaleEffect(1.2)
             Text("Loading lists...")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
     }
@@ -326,15 +326,15 @@ struct ListBrowserView: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "list.bullet.rectangle")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
             
             Text("No lists yet")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text("Create one to get started.")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
             
             Button {

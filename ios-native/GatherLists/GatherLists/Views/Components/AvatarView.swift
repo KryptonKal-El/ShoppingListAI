@@ -28,7 +28,7 @@ struct AvatarView: View {
             .frame(width: size, height: size)
             .overlay(
                 Text(initial)
-                    .font(.system(size: size * 0.5))
+                    .font(.quicksand(size: size * 0.5))
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
             )

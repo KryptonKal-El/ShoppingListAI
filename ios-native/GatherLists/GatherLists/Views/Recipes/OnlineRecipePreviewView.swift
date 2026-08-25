@@ -70,14 +70,14 @@ struct OnlineRecipePreviewView: View {
                 
                 VStack(alignment: .leading, spacing: 12) {
                     Text(detail.title)
-                        .font(.title2)
+                        .font(.quicksand(.title2))
                         .fontWeight(.bold)
                     
                     metaRow(readyInMinutes: detail.readyInMinutes, servings: detail.servings)
                     
                     if let url = URL(string: detail.sourceUrl) {
                         Link("View original recipe", destination: url)
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                             .foregroundStyle(.blue)
                     }
                     
@@ -111,7 +111,7 @@ struct OnlineRecipePreviewView: View {
                 Color(.systemGray5)
                     .overlay {
                         Image(systemName: "photo")
-                            .font(.largeTitle)
+                            .font(.quicksand(.largeTitle))
                             .foregroundStyle(.secondary)
                     }
             case .empty:
@@ -138,7 +138,7 @@ struct OnlineRecipePreviewView: View {
             Label("\(readyInMinutes) min", systemImage: "clock")
             Label("\(servings) servings", systemImage: "person.2")
         }
-        .font(.subheadline)
+        .font(.quicksand(.subheadline))
         .foregroundStyle(.secondary)
     }
     
@@ -146,16 +146,16 @@ struct OnlineRecipePreviewView: View {
     private func ingredientsSection(ingredients: [SpoonacularIngredient]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Ingredients (\(ingredients.count))")
-                .font(.headline)
+                .font(.quicksand(.headline))
             
             ForEach(Array(ingredients.enumerated()), id: \.offset) { _, ingredient in
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "circle.fill")
-                        .font(.system(size: 6))
+                        .font(.quicksand(size: 6))
                         .foregroundStyle(.secondary)
                         .padding(.top, 6)
                     Text(ingredient.original)
-                        .font(.body)
+                        .font(.quicksand(.body))
                 }
             }
         }
@@ -167,12 +167,12 @@ struct OnlineRecipePreviewView: View {
         
         VStack(alignment: .leading, spacing: 12) {
             Text("Instructions (\(steps.count) steps)")
-                .font(.headline)
+                .font(.quicksand(.headline))
             
             ForEach(steps, id: \.number) { step in
                 HStack(alignment: .top, spacing: 12) {
                     Text("\(step.number)")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .frame(width: 24, height: 24)
@@ -180,7 +180,7 @@ struct OnlineRecipePreviewView: View {
                         .clipShape(Circle())
                     
                     Text(step.step)
-                        .font(.body)
+                        .font(.quicksand(.body))
                 }
             }
         }
@@ -227,7 +227,7 @@ struct OnlineRecipePreviewView: View {
             ProgressView()
                 .scaleEffect(1.2)
             Text("Loading recipe...")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -237,15 +237,15 @@ struct OnlineRecipePreviewView: View {
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.orange)
             
             Text("Couldn't load recipe")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
             
             Text(message)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             

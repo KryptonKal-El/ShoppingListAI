@@ -38,7 +38,7 @@ struct CollaboratorsInfoSheet: View {
         VStack(spacing: 12) {
             ProgressView()
             Text("Loading...")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -47,10 +47,10 @@ struct CollaboratorsInfoSheet: View {
     private func errorView(_ message: String) -> some View {
         VStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.largeTitle)
+                .font(.quicksand(.largeTitle))
                 .foregroundStyle(.secondary)
             Text(message)
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -91,10 +91,10 @@ struct CollaboratorsInfoSheet: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.displayName ?? "Unknown")
-                    .font(.body)
+                    .font(.quicksand(.body))
                 if profile.id == currentUserId {
                     Text("You")
-                        .font(.caption)
+                        .font(.quicksand(.caption))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -104,7 +104,7 @@ struct CollaboratorsInfoSheet: View {
             if isOwner {
                 Image(systemName: "crown.fill")
                     .foregroundStyle(.orange)
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
             }
         }
     }

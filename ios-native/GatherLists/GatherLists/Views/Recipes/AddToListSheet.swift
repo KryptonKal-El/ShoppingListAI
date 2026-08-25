@@ -168,10 +168,10 @@ struct AddToListSheet: View {
     private func successView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 56))
+                .font(.quicksand(size: 56))
                 .foregroundStyle(.green)
             Text(message)
-                .font(.headline)
+                .font(.quicksand(.headline))
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -185,12 +185,12 @@ struct AddToListSheet: View {
     private var emptyView: some View {
         VStack(spacing: 16) {
             Image(systemName: "list.bullet.rectangle")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(.secondary)
             Text("No Lists")
-                .font(.headline)
+                .font(.quicksand(.headline))
             Text("Create a shopping list first to add ingredients.")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -204,7 +204,7 @@ struct AddToListSheet: View {
             Form {
                 Section {
                     Text(ingredientSummary)
-                        .font(.subheadline)
+                        .font(.quicksand(.subheadline))
                         .foregroundStyle(.secondary)
                 }
                 
@@ -215,7 +215,7 @@ struct AddToListSheet: View {
                         } label: {
                             HStack {
                                 Text((list.emoji?.containsVisualEmoji == true ? list.emoji : nil) ?? "🛒")
-                                    .font(.title3)
+                                    .font(.quicksand(.title3))
                                 Text(list.name)
                                     .foregroundStyle(.primary)
                                 Spacer()
@@ -236,7 +236,7 @@ struct AddToListSheet: View {
                     Section {
                         Text(error)
                             .foregroundStyle(.red)
-                            .font(.subheadline)
+                            .font(.quicksand(.subheadline))
                     }
                 }
             }
@@ -277,10 +277,10 @@ struct AddToListSheet: View {
             if newItems.isEmpty && duplicateItems.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "tray")
-                        .font(.system(size: 48))
+                        .font(.quicksand(size: 48))
                         .foregroundStyle(.secondary)
                     Text("Nothing to add")
-                        .font(.headline)
+                        .font(.quicksand(.headline))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -312,7 +312,7 @@ struct AddToListSheet: View {
                         Section {
                             Text(error)
                                 .foregroundStyle(.red)
-                                .font(.subheadline)
+                                .font(.quicksand(.subheadline))
                         }
                     }
                 }
@@ -528,7 +528,7 @@ struct AddToListSheet: View {
                                     Spacer()
                                     Text("\(item.quantity) \(item.unit)")
                                         .foregroundStyle(.secondary)
-                                        .font(.subheadline)
+                                        .font(.quicksand(.subheadline))
                                 }
                             }
                         }
@@ -585,7 +585,7 @@ private struct PreviewNewItemRow: View {
             } label: {
                 Image(systemName: item.isExcluded ? "circle" : "checkmark.circle.fill")
                     .foregroundStyle(item.isExcluded ? Color.secondary : Color.blue)
-                    .font(.title3)
+                    .font(.quicksand(.title3))
             }
             .buttonStyle(.plain)
             
@@ -609,14 +609,14 @@ private struct PreviewNewItemRow: View {
                     }
                 } label: {
                     Image(systemName: "minus.circle.fill")
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                         .foregroundStyle(item.quantity > 1 && !item.isExcluded ? Color.blue : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .disabled(item.quantity <= 1 || item.isExcluded)
                 
                 Text("\(item.quantity)")
-                    .font(.body.monospacedDigit())
+                    .font(.quicksand(.body).monospacedDigit())
                     .frame(minWidth: 24)
                     .foregroundStyle(item.isExcluded ? Color.secondary : Color.primary)
                 
@@ -624,7 +624,7 @@ private struct PreviewNewItemRow: View {
                     item.quantity += 1
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                         .foregroundStyle(item.isExcluded ? Color.secondary : Color.blue)
                 }
                 .buttonStyle(.plain)
@@ -632,7 +632,7 @@ private struct PreviewNewItemRow: View {
             }
             
             Text(item.unit)
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 40, alignment: .leading)
         }
@@ -650,7 +650,7 @@ private struct PreviewDuplicateItemRow: View {
             } label: {
                 Image(systemName: item.isExcluded ? "circle" : "checkmark.circle.fill")
                     .foregroundStyle(item.isExcluded ? Color.secondary : Color.blue)
-                    .font(.title3)
+                    .font(.quicksand(.title3))
             }
             .buttonStyle(.plain)
             
@@ -660,7 +660,7 @@ private struct PreviewDuplicateItemRow: View {
                     .foregroundStyle(item.isExcluded ? Color.secondary : Color.primary)
                 
                 Text("\(item.currentQuantity) → \(item.newQuantity) \(item.unit)")
-                    .font(.caption)
+                    .font(.quicksand(.caption))
                     .foregroundStyle(.secondary)
             }
             
@@ -673,14 +673,14 @@ private struct PreviewDuplicateItemRow: View {
                     }
                 } label: {
                     Image(systemName: "minus.circle.fill")
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                         .foregroundStyle(item.newQuantity > item.currentQuantity && !item.isExcluded ? Color.blue : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .disabled(item.newQuantity <= item.currentQuantity || item.isExcluded)
                 
                 Text("\(item.newQuantity)")
-                    .font(.body.monospacedDigit())
+                    .font(.quicksand(.body).monospacedDigit())
                     .frame(minWidth: 24)
                     .foregroundStyle(item.isExcluded ? Color.secondary : Color.primary)
                 
@@ -688,7 +688,7 @@ private struct PreviewDuplicateItemRow: View {
                     item.newQuantity += 1
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.title3)
+                        .font(.quicksand(.title3))
                         .foregroundStyle(item.isExcluded ? Color.secondary : Color.blue)
                 }
                 .buttonStyle(.plain)

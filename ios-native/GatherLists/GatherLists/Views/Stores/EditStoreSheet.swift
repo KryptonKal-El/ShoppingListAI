@@ -98,7 +98,7 @@ struct EditStoreSheet: View {
                         .overlay {
                             if selectedPresetColor == colorHex {
                                 Image(systemName: "checkmark")
-                                    .font(.system(size: 14, weight: .bold))
+                                    .font(.quicksand(size: 14, weight: .bold))
                                     .foregroundStyle(Color(hex: "#2C3E35"))
                             }
                         }

@@ -93,7 +93,7 @@ struct CookModeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Gather your ingredients")
-                        .font(.title2)
+                        .font(.quicksand(.title2))
                         .fontWeight(.bold)
                         .padding(.top, 8)
 
@@ -104,15 +104,15 @@ struct CookModeView: View {
                             HStack(spacing: 14) {
                                 Image(systemName: gatheredIngredients.contains(ingredient.id) ? "checkmark.circle.fill" : "circle")
                                     .foregroundStyle(gatheredIngredients.contains(ingredient.id) ? .green : .secondary)
-                                    .font(.title2)
+                                    .font(.quicksand(.title2))
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(ingredient.name)
-                                        .font(.title3)
+                                        .font(.quicksand(.title3))
                                         .strikethrough(gatheredIngredients.contains(ingredient.id))
                                         .foregroundStyle(gatheredIngredients.contains(ingredient.id) ? .secondary : .primary)
                                     if let qty = ingredient.quantity, !qty.isEmpty {
                                         Text(qty)
-                                            .font(.subheadline)
+                                            .font(.quicksand(.subheadline))
                                             .foregroundStyle(.secondary)
                                     }
                                 }
@@ -157,7 +157,7 @@ struct CookModeView: View {
                     .tint(.green)
                     .animation(.easeInOut(duration: 0.35), value: completedCount)
                 Text("Step \(currentStepIndex + 1) of \(steps.count)")
-                    .font(.subheadline)
+                    .font(.quicksand(.subheadline))
                     .fontWeight(.medium)
                     .foregroundStyle(.secondary)
             }
@@ -168,11 +168,11 @@ struct CookModeView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     if step.completedAt != nil {
                         Label("Done", systemImage: "checkmark.circle.fill")
-                            .font(.headline)
+                            .font(.quicksand(.headline))
                             .foregroundStyle(.green)
                     }
                     Text(step.instruction)
-                        .font(.title)
+                        .font(.quicksand(.title))
                         .fontWeight(.medium)
                         .lineSpacing(6)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -187,7 +187,7 @@ struct CookModeView: View {
                             goToStep(currentStepIndex - 1)
                         } label: {
                             Image(systemName: "chevron.left")
-                                .font(.title3)
+                                .font(.quicksand(.title3))
                                 .fontWeight(.semibold)
                                 .padding(.vertical, 16)
                                 .padding(.horizontal, 20)
@@ -225,14 +225,14 @@ struct CookModeView: View {
         VStack(spacing: 24) {
             Spacer()
             Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 64))
+                .font(.quicksand(size: 64))
                 .foregroundStyle(.green)
             Text("Nice cooking!")
-                .font(.largeTitle)
+                .font(.quicksand(.largeTitle))
                 .fontWeight(.bold)
             if let session = cookViewModel.activeSession {
                 Text("Cooked in \(formattedDuration(session.duration))")
-                    .font(.title3)
+                    .font(.quicksand(.title3))
                     .foregroundStyle(.secondary)
             }
             Spacer()

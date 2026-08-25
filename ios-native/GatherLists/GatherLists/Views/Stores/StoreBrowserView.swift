@@ -143,12 +143,12 @@ struct StoreBrowserView: View {
                 .frame(width: 12, height: 12)
             
             Text(store.name)
-                .font(.body)
+                .font(.quicksand(.body))
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.tertiary)
         }
     }
@@ -158,7 +158,7 @@ struct StoreBrowserView: View {
             ProgressView()
                 .scaleEffect(1.2)
             Text("Loading stores...")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(.secondary)
         }
     }
@@ -166,16 +166,16 @@ struct StoreBrowserView: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "storefront")
-                .font(.system(size: 48))
+                .font(.quicksand(size: 48))
                 .foregroundStyle(Color(.secondaryLabel))
             
             Text("No stores yet")
-                .font(.title2)
+                .font(.quicksand(.title2))
                 .fontWeight(.semibold)
                 .foregroundStyle(Color(.secondaryLabel))
             
             Text("Add a store to organize items by where you shop.")
-                .font(.subheadline)
+                .font(.quicksand(.subheadline))
                 .foregroundStyle(Color(.tertiaryLabel))
                 .multilineTextAlignment(.center)
             

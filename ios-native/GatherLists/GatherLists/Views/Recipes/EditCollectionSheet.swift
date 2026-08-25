@@ -40,10 +40,10 @@ struct EditCollectionSheet: View {
                         HStack {
                             if let emoji = selectedEmoji {
                                 Text(emoji)
-                                    .font(.system(size: 32))
+                                    .font(.quicksand(size: 32))
                             } else {
                                 Image(systemName: "face.smiling")
-                                    .font(.title2)
+                                    .font(.quicksand(.title2))
                                     .foregroundStyle(.secondary)
                             }
                             
@@ -53,7 +53,7 @@ struct EditCollectionSheet: View {
                                 .foregroundStyle(.secondary)
                             
                             Image(systemName: "chevron.right")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.tertiary)
                         }
                     }

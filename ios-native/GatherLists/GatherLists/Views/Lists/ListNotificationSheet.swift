@@ -54,9 +54,9 @@ struct ListNotificationSheet: View {
                     Section {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Notifications are disabled for this app.")
-                                .font(.subheadline)
+                                .font(.quicksand(.subheadline))
                             Text("To enable, go to Settings > Gather Lists > Notifications.")
-                                .font(.caption)
+                                .font(.quicksand(.caption))
                                 .foregroundStyle(.secondary)
                         }
                     }

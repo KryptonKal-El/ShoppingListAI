@@ -74,7 +74,7 @@ struct CreateListSheet: View {
                                     VStack(spacing: 6) {
                                     ListTypeIconView(typeId: typeId, size: 28)
                                     Text(config.label)
-                                        .font(.caption)
+                                        .font(.quicksand(.caption))
                                         .fontWeight(.medium)
                                         .foregroundStyle(.primary)
                                 }
@@ -108,10 +108,10 @@ struct CreateListSheet: View {
                             HStack {
                             if let emoji = selectedEmoji, emoji.containsVisualEmoji {
                                 Text(emoji)
-                                        .font(.system(size: 32))
+                                        .font(.quicksand(size: 32))
                                 } else {
                                     Image(systemName: "face.smiling")
-                                        .font(.title2)
+                                        .font(.quicksand(.title2))
                                         .foregroundStyle(.secondary)
                                 }
                                 
@@ -121,7 +121,7 @@ struct CreateListSheet: View {
                                     .foregroundStyle(.secondary)
                                 
                                 Image(systemName: "chevron.right")
-                                    .font(.caption)
+                                    .font(.quicksand(.caption))
                                     .foregroundStyle(.tertiary)
                             }
                             .contentShape(Rectangle())
@@ -160,7 +160,7 @@ struct CreateListSheet: View {
                                                     .foregroundStyle(.primary)
                                                 Spacer()
                                                 Image(systemName: "chevron.right")
-                                                    .font(.caption)
+                                                    .font(.quicksand(.caption))
                                                     .foregroundStyle(.tertiary)
                                             }
                                             .contentShape(Rectangle())
@@ -189,7 +189,7 @@ struct CreateListSheet: View {
                                     if !showCategoryPreview {
                                         Text("\(displayCategories.count) \(displayCategories.count == 1 ? "default" : "defaults")")
                                             .foregroundStyle(.secondary)
-                                            .font(.subheadline)
+                                            .font(.quicksand(.subheadline))
                                     }
                                 }
                             }
@@ -282,7 +282,7 @@ struct CreateListSheet: View {
                             .overlay {
                                 if selectedPresetColor == colorHex {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.quicksand(size: 14, weight: .bold))
                                         .foregroundStyle(Color(hex: "#2C3E35"))
                                 }
                             }

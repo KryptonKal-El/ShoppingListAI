@@ -43,6 +43,13 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/Quicksand-Regular.ttf</string>
+		<string>Fonts/Quicksand-Medium.ttf</string>
+		<string>Fonts/Quicksand-SemiBold.ttf</string>
+		<string>Fonts/Quicksand-Bold.ttf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>

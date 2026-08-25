@@ -6,9 +6,9 @@ struct CachedDataBanner: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "clock.arrow.circlepath")
-                .font(.caption2)
+                .font(.quicksand(.caption2))
             Text("Showing cached data \u{00B7} Last updated \(relativeTime)")
-                .font(.caption)
+                .font(.quicksand(.caption))
         }
         .foregroundStyle(.orange.opacity(0.9))
         .frame(maxWidth: .infinity)
