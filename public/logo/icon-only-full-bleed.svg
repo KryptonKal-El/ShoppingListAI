@@ -1,27 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="300" height="300">
   <defs>
+    <linearGradient id="tileGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C6EED7"/>
+      <stop offset="1" stop-color="#A5E0BE"/>
+    </linearGradient>
     <filter id="heartShadow" x="-40%" y="-40%" width="180%" height="180%">
       <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#2C5C4A" flood-opacity="0.3"/>
     </filter>
   </defs>
 
-  <rect width="200" height="200" fill="#B5E8C8"/>
+  <rect width="200" height="200" fill="url(#tileGrad)"/>
 
   <g transform="translate(37.8,45.8) scale(1.35)" filter="url(#heartShadow)">
     <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
     <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <rect x="76" y="56" width="84" height="12" rx="6" fill="#FFFFFF"/>
+  <rect x="76" y="56" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
 
   <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
     <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
     <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <rect x="76" y="94" width="84" height="12" rx="6" fill="#FFFFFF"/>
+  <rect x="76" y="94" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
 
   <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
     <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
     <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <rect x="76" y="132" width="84" height="12" rx="6" fill="#FFFFFF"/>
+  <rect x="76" y="132" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
 </svg>

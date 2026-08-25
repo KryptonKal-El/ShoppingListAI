@@ -34,6 +34,7 @@ struct StackedLogoView: View {
             RoundedRectangle(cornerRadius: 6.5 * scale)
                 .fill(secondaryTextColor)
                 .frame(width: 96 * scale, height: 13 * scale)
+                .shadow(color: heartShadowColor.opacity(0.3), radius: 1.5 * scale, x: 0, y: 1.5 * scale)
         }
     }
 

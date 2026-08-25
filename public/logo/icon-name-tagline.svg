@@ -94,19 +94,19 @@
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8"/>
+    <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
 
     <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8"/>
+    <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
 
     <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8"/>
+    <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
   </g>
 
   <text x="150" y="78" font-family="'Quicksand', 'Avenir Next', 'Trebuchet MS', sans-serif" font-weight="600" fill="#3D7A63" letter-spacing="-1">

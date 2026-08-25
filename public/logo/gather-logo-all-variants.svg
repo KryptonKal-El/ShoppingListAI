@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" width="900" height="640">
   <defs>
+    <linearGradient id="tileGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C6EED7"/>
+      <stop offset="1" stop-color="#A5E0BE"/>
+    </linearGradient>
     <style>
       /* vietnamese */
 @font-face {
@@ -95,22 +99,22 @@
   <!-- APP ICON (tile) -->
   <text x="160" y="62" font-family="Georgia, serif" font-size="10" fill="#BBBBBB" text-anchor="middle" letter-spacing="2">APP ICON</text>
   <g transform="translate(90,74) scale(0.7)">
-    <rect width="200" height="200" rx="50" fill="#B5E8C8"/>
+    <rect width="200" height="200" rx="50" fill="url(#tileGrad)"/>
     <g transform="translate(37.8,45.8) scale(1.35)" filter="url(#heartShadow)">
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="56" width="84" height="12" rx="6" fill="#FFFFFF"/>
+    <rect x="76" y="56" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
     <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="94" width="84" height="12" rx="6" fill="#FFFFFF"/>
+    <rect x="76" y="94" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
     <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
       <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
       <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <rect x="76" y="132" width="84" height="12" rx="6" fill="#FFFFFF"/>
+    <rect x="76" y="132" width="84" height="12" rx="6" fill="#FFFFFF" filter="url(#heartShadow)"/>
   </g>
 
   <!-- WEB LOGO (no tile) + NAME -->
@@ -121,17 +125,17 @@
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
     </g>
     <text x="148" y="86" font-family="'Quicksand', 'Avenir Next', 'Trebuchet MS', sans-serif" font-weight="600" fill="#3D7A63" letter-spacing="-1">
       <tspan font-size="62">Gather </tspan><tspan font-size="34" font-weight="500" fill="#85BFA8">Lists</tspan>
@@ -146,17 +150,17 @@
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
     </g>
     <text x="150" y="78" font-family="'Quicksand', 'Avenir Next', 'Trebuchet MS', sans-serif" font-weight="600" fill="#3D7A63" letter-spacing="-1">
       <tspan font-size="60">Gather </tspan><tspan font-size="33" font-weight="500" fill="#85BFA8">Lists</tspan>
@@ -172,17 +176,17 @@
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="56" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="94" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
       <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
         <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
         <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8"/>
+      <rect x="76" y="132" width="84" height="12" rx="6" fill="#85BFA8" filter="url(#heartShadow)"/>
     </g>
     <text x="200" y="175" font-family="'Quicksand', 'Avenir Next', 'Trebuchet MS', sans-serif" font-weight="600" fill="#3D7A63" letter-spacing="-1" text-anchor="middle">
       <tspan font-size="52">Gather </tspan><tspan font-size="29" font-weight="500" fill="#85BFA8">Lists</tspan>
