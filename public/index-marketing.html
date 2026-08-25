@@ -605,7 +605,7 @@
                 let mouse = { x: null, y: null };
                 let particles = [];
                 const COUNT = 80;
-                const PARTICLE_RADIUS = 4;
+                const PARTICLE_RADIUS = 5;
                 const MAX_DIST = 120;
 
                 function resize() {
@@ -704,14 +704,21 @@
                 }
 
                 window.addEventListener('resize', function() { resize(); init(); });
-                canvas.addEventListener('mousemove', function(e) {
+                /* Pointer events cover mouse AND touch, so dragging a finger on iOS
+                   tracks continuously instead of jumping to a single tap point. */
+                function trackPointer(e) {
                     const rect = canvas.getBoundingClientRect();
                     mouse.x = e.clientX - rect.left;
                     mouse.y = e.clientY - rect.top;
-                });
-                canvas.addEventListener('mouseleave', function() {
+                }
+                function clearPointer() {
                     mouse.x = null; mouse.y = null;
-                });
+                }
+                canvas.addEventListener('pointermove', trackPointer);
+                canvas.addEventListener('pointerdown', trackPointer);
+                canvas.addEventListener('pointerup', clearPointer);
+                canvas.addEventListener('pointercancel', clearPointer);
+                canvas.addEventListener('pointerleave', clearPointer);
 
                 resize();
                 init();

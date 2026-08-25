@@ -3,6 +3,7 @@
  */
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { HeartfieldBackground } from './HeartfieldBackground.jsx';
 import styles from './Login.module.css';
 
 /**
@@ -64,6 +65,7 @@ export const Login = () => {
 
   return (
     <div className={styles.backdrop}>
+      <HeartfieldBackground />
       <div className={styles.card}>
         <div className={styles.logoStack}>
           <img src="/logo/stacked.svg" alt="Gather Lists" className={styles.logoImg} />

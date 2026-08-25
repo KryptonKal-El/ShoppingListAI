@@ -1,19 +1,23 @@
 .backdrop {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--login-gradient-start) 0%, var(--login-gradient-end) 100%);
+  background: #0a0a0a;
   padding: 1rem;
 }
 
 .card {
+  position: relative;
+  z-index: 1;
   background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 16px;
   padding: 2.5rem 2rem;
   max-width: 400px;
   width: 100%;
-  box-shadow: 0 4px 24px var(--overlay-light);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
   text-align: center;
 }
 
