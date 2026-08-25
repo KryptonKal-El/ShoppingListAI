@@ -27,11 +27,11 @@ struct PlaceholderWidgetEntryView: View {
     var body: some View {
         VStack {
             Image(systemName: "list.bullet")
-                .font(.largeTitle)
+                .font(.quicksand(.largeTitle))
             Text("Gather Lists")
-                .font(.headline)
+                .font(.quicksand(.headline))
             Text("Coming Soon")
-                .font(.caption)
+                .font(.quicksand(.caption))
                 .foregroundStyle(.secondary)
         }
         .containerBackground(.fill.tertiary, for: .widget)

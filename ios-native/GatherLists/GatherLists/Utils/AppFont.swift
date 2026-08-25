@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Brand typography: Quicksand for every text style (bundled in Fonts/, registered via UIAppFonts).
+/// Brand typography: Quicksand for every text style (bundled in Fonts/, registered via
+/// UIAppFonts in both the app and widget-extension Info.plists).
 /// Mirrors the system text styles' base sizes so Dynamic Type scaling keeps working.
-/// The widget extension intentionally stays on the system font (fonts aren't bundled there).
 extension Font {
     /// Quicksand at a fixed size.
     static func quicksand(size: CGFloat, weight: Font.Weight = .medium) -> Font {

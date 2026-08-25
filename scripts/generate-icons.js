@@ -29,7 +29,7 @@ const IOS_APPICON = join(IOS_ASSETS, 'AppIcon.appiconset', 'icon-foreground.png'
 const IOS_LAUNCH_LOGO_DIR = join(IOS_ASSETS, 'LaunchLogo.imageset');
 
 // Served logo SVGs that carry <text>: fonts must be embedded because SVG-in-<img> cannot load external fonts
-const TEXT_LOGO_SVGS = ['icon-name.svg', 'icon-name-tagline.svg', 'stacked.svg', 'gather-logo-all-variants.svg'];
+const TEXT_LOGO_SVGS = ['icon-name.svg', 'icon-name-dark.svg', 'icon-name-tagline.svg', 'stacked.svg', 'gather-logo-all-variants.svg'];
 
 // Ensure assets directory exists
 if (!existsSync(ASSETS)) {

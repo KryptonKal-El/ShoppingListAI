@@ -10,6 +10,8 @@
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* GatherListsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* GatherListsApp.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E1F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F5 /* Assets.xcassets */; };
 		A1B2C3D4E5F6A7B8C9D0F001 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0F002 /* Fonts */; };
+		A1B2C3D4E5F6A7B8C9D0F005 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0F002 /* Fonts */; };
+		A1B2C3D4E5F6A7B8C9D0F006 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0F003 /* AppFont.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E1F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F7 /* Preview Assets.xcassets */; };
 		A1B2C3D4E5F6A7B8C9D0E221 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E220 /* PrivacyInfo.xcprivacy */; };
 		A1B2C3D4E5F6A7B8C9D0E231 /* GatherList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E230 /* GatherList.swift */; };
@@ -792,6 +794,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F6A7B8C9D0F005 /* Fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -945,6 +948,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				WIDGETBUNDLE0000000000002 /* GatherListsWidgetsBundle.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0F006 /* AppFont.swift in Sources */,
 				WIDGETPLACEHOLDER000000002 /* PlaceholderWidget.swift in Sources */,
 				WIDGETDATAPROV0000000002 /* WidgetDataProvider.swift in Sources */,
 				WIDGETITEM0000000000000002 /* Item.swift in Sources */,
