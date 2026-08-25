@@ -11,7 +11,7 @@ struct StackedLogoView: View {
     private let heartShadowColor = Color(hex: "#2C5C4A")
 
     var body: some View {
-        VStack(spacing: 14 * scale) {
+        VStack(spacing: 26 * scale) {
             glyphView
             VStack(spacing: 6 * scale) {
                 titleText
