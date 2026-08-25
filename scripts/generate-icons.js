@@ -4,7 +4,7 @@
  *
  * Run: node scripts/generate-icons.js
  */
-import { readFileSync, mkdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp';
@@ -17,12 +17,19 @@ const LOGO_SVG_PATH = join(PUBLIC, 'logo', 'icon-only-full-bleed.svg');
 const STACKED_SVG_PATH = join(PUBLIC, 'logo', 'stacked.svg');
 
 // Brand colors
-const GRADIENT_MIDPOINT = '#AEDFD9';
 const DARK_BACKGROUND = '#1a1a2e';
 const LIGHT_SPLASH_BG = '#FFFFFF';
 
 // Stacked logo viewBox dimensions
-const STACKED_VIEWBOX = { x: 310, y: 410, width: 280, height: 225 };
+const STACKED_VIEWBOX = { x: 0, y: 0, width: 400, height: 225 };
+
+// iOS asset catalog targets (written directly so Xcode picks up regenerated art)
+const IOS_ASSETS = join(PROJECT_ROOT, 'ios-native', 'GatherLists', 'GatherLists', 'Assets.xcassets');
+const IOS_APPICON = join(IOS_ASSETS, 'AppIcon.appiconset', 'icon-foreground.png');
+const IOS_LAUNCH_LOGO_DIR = join(IOS_ASSETS, 'LaunchLogo.imageset');
+
+// Served logo SVGs that carry <text>: fonts must be embedded because SVG-in-<img> cannot load external fonts
+const TEXT_LOGO_SVGS = ['icon-name.svg', 'icon-name-tagline.svg', 'stacked.svg', 'gather-logo-all-variants.svg'];
 
 // Ensure assets directory exists
 if (!existsSync(ASSETS)) {
@@ -184,7 +191,59 @@ const generateCapacitorIcons = async (svgContent) => {
 
   await sharp(iconBuffer).toFile(iconFgPath);
   console.log(`Generated ${iconFgPath} (1024x1024, full-bleed)`);
+
+  await sharp(iconBuffer).toFile(IOS_APPICON);
+  console.log(`Generated ${IOS_APPICON} (1024x1024, iOS AppIcon)`);
+}
+
+/**
+ * Generate the 180x180 opaque apple-touch-icon (iOS applies its own corner mask).
+ * @param {string} svgContent - SVG content from icon-only-full-bleed.svg
+ */
+const generateAppleTouchIcon = async (svgContent) => {
+  const outputPath = join(PUBLIC, 'apple-touch-icon.png');
+  await sharp(Buffer.from(svgContent))
+    .resize(180, 180)
+    .png()
+    .toFile(outputPath);
+  console.log(`Generated ${outputPath} (180x180)`);
 };
+
+/**
+ * Generate the iOS launch-screen logo imageset (@1x/@2x/@3x) from the stacked logo.
+ */
+const generateLaunchLogos = async () => {
+  const stackedSvgRaw = readStackedSvg();
+  const stackedSvgWithFonts = await embedFontsInSvg(stackedSvgRaw);
+  for (const scale of [1, 2, 3]) {
+    const width = STACKED_VIEWBOX.width * scale;
+    const height = STACKED_VIEWBOX.height * scale;
+    const outputPath = join(IOS_LAUNCH_LOGO_DIR, `stacked-logo@${scale}x.png`);
+    await sharp(Buffer.from(stackedSvgWithFonts))
+      .resize(width, height)
+      .png()
+      .toFile(outputPath);
+    console.log(`Generated ${outputPath} (${width}x${height})`);
+  }
+};
+
+/**
+ * Embed Google Fonts into the served logo SVGs in place (idempotent: a file with no
+ * remaining Google Fonts import is left unchanged).
+ */
+const embedFontsIntoLogoSvgs = async () => {
+  for (const name of TEXT_LOGO_SVGS) {
+    const path = join(PUBLIC, 'logo', name);
+    const original = readFileSync(path, 'utf-8');
+    const embedded = await embedFontsInSvg(original);
+    if (embedded !== original) {
+      writeFileSync(path, embedded);
+      console.log(`Embedded fonts into ${path}`);
+    } else {
+      console.log(`No font import to embed in ${path} (already embedded)`);
+    }
+  }
+};;
 
 /**
  * Generate splash screens for Capacitor using stacked logo with embedded fonts.
@@ -228,8 +287,17 @@ const main = async () => {
   console.log('\nGenerating Capacitor icons...');
   await generateCapacitorIcons(svgContent);
 
+  console.log('\nGenerating apple-touch-icon...');
+  await generateAppleTouchIcon(svgContent);
+
+  console.log('\nEmbedding fonts into served logo SVGs...');
+  await embedFontsIntoLogoSvgs();
+
   console.log('\nGenerating splash screens...');
   await generateSplashScreens();
+
+  console.log('\nGenerating iOS launch logos...');
+  await generateLaunchLogos();
 
   console.log('\nDone!');
 };

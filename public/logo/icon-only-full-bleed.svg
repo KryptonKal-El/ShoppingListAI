@@ -1,21 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="300" height="300">
   <defs>
-    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#B5E8C8;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#A8D8EA;stop-opacity:1" />
-    </linearGradient>
+    <filter id="heartShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#2C5C4A" flood-opacity="0.3"/>
+    </filter>
   </defs>
 
-  <rect width="300" height="300" fill="url(#iconGrad)"/>
+  <rect width="200" height="200" fill="#B5E8C8"/>
 
-  <circle cx="70" cy="100" r="15" fill="#FFFFFF" opacity="0.95"/>
-  <rect x="102.5" y="87.5" width="130" height="25" rx="12.5" fill="#FFFFFF" opacity="0.95"/>
+  <g transform="translate(37.8,45.8) scale(1.35)" filter="url(#heartShadow)">
+    <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
+    <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <rect x="76" y="56" width="84" height="12" rx="6" fill="#FFFFFF"/>
 
-  <circle cx="70" cy="150" r="15" fill="#FFFFFF" opacity="0.95"/>
-  <rect x="102.5" y="137.5" width="100" height="25" rx="12.5" fill="#FFFFFF" opacity="0.95"/>
+  <g transform="translate(37.8,83.8) scale(1.35)" filter="url(#heartShadow)">
+    <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
+    <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <rect x="76" y="94" width="84" height="12" rx="6" fill="#FFFFFF"/>
 
-  <circle cx="70" cy="200" r="15" fill="#FFFFFF" opacity="0.95"/>
-  <rect x="102.5" y="187.5" width="120" height="25" rx="12.5" fill="#FFFFFF" opacity="0.95"/>
-
-  <path d="M250,65 C250,65 215,40 215,20 C215,7.5 225,0 232.5,0 C240,0 245,5 250,10 C255,5 260,0 267.5,0 C275,0 285,7.5 285,20 C285,40 250,65 250,65 Z" fill="#F9A8C9" opacity="0.92"/>
+  <g transform="translate(37.8,121.8) scale(1.35)" filter="url(#heartShadow)">
+    <path d="M12 21C8 17.5 2 13 2 8.2 2 5.3 4.2 3 7 3c2 0 3.8 1.1 5 2.9C13.2 4.1 15 3 17 3c2.8 0 5 2.3 5 5.2C22 13 16 17.5 12 21Z" fill="#F9A8C9"/>
+    <path d="M7.6 11.4 L10.9 14.7 L16.6 8.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <rect x="76" y="132" width="84" height="12" rx="6" fill="#FFFFFF"/>
 </svg>
